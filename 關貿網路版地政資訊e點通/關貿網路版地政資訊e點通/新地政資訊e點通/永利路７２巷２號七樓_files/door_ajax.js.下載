@@ -1,0 +1,275 @@
+function setLoadText(no_div,road_div,lane_div,alley_div,number_div,floor_div,roadbig5_div){
+	var road=$(road_div).find('option:selected').val();
+	var road_utf8=$(road_div).find('option:selected').text();
+//	$(no_div).val(road);
+	$(no_div).val(road_utf8);
+	$(roadbig5_div).val(road);
+	$(lane_div).empty();
+	$(lane_div).append($("<option></option>").attr("value","").text("巷"));
+	$(alley_div).empty();
+	$(alley_div).append($("<option></option>").attr("value","").text("弄"));
+	$(number_div).val('');
+	$(floor_div).val('');
+	
+}
+
+function setLaneText(no_div,road_div,lane_div,number_div,floor_div,roadbig5_div){
+	var road=$(road_div).find('option:selected').val();
+	var road_text=$(road_div).find('option:selected').text();
+	var lane=$(lane_div).find('option:selected').val();
+    //$(no_div).val(road+lane);
+    $(no_div).val(road_text+lane);
+    $(roadbig5_div).val( $(no_div).val());
+    $(number_div).val('');
+	$(floor_div).val('');
+}
+
+function setAlleyText(no_div,road_div,lane_div,alley_div,number_div,floor_div,roadbig5_div){
+	var road=$(road_div).find('option:selected').val();
+	var road_text=$(road_div).find('option:selected').text();
+	var lane=$(lane_div).find('option:selected').val();
+	var alley=$(alley_div).find('option:selected').val();
+    //$(no_div).val(road+lane+alley);
+    $(no_div).val(road_text+lane+alley);
+    $(roadbig5_div).val( $(no_div).val());
+    $(number_div).val('');
+	$(floor_div).val('');
+}
+
+function setNumberText(no_div,road_div,lane_div,alley_div,number_div,roadbig5_div){
+	var road=$(road_div).find('option:selected').val();
+	var road_text=$(road_div).find('option:selected').text();
+	var lane=$(lane_div).find('option:selected').val();
+	var alley=$(alley_div).find('option:selected').val();
+	var number=$(number_div).val();
+    $(no_div).val(road_text+lane+alley+number);
+    $(roadbig5_div).val( road+lane+alley+number);
+//    $(no_div).val(road+lane+alley+number);
+//    $(roadbig5_div).val( $(no_div).val());
+    if(number!=''){
+    	 $(roadbig5_div).val( $(no_div).val()+'號');
+//    	  $(no_div).val($(no_div).val()+'號');
+    	 $(no_div).val(road_text+lane+alley+number+'號');
+    	 
+    }
+}
+
+
+function setFloorText(no_div,road_div,lane_div,alley_div,number_div,floor_div,roadbig5_div){
+	var road=$(road_div).find('option:selected').val();
+	var road_text=$(road_div).find('option:selected').text();
+	var lane=$(lane_div).find('option:selected').val();
+	var alley=$(alley_div).find('option:selected').val();
+	var number=$(number_div).val()+'號';
+	var floor=$(floor_div).val();
+    $(no_div).val(road+lane+alley+number+floor);
+    $(roadbig5_div).val( $(no_div).val());
+    if(floor!=''){
+    	 $(roadbig5_div).val( $(no_div).val()+'樓');
+    	  //$(no_div).val($(no_div).val()+'樓');
+    	 
+    	 $(no_div).val(road_text+lane+alley+number+floor+'樓');
+    }
+}
+
+//取得門牌號碼
+function catchDoorInfo(country,area,keyin){
+	var send_town=true;//測式
+	if($(country).find('option:selected').val()==""){
+		alert("請選擇縣市");
+		return;
+    }
+	
+	if((send_town)&&($(area).find('option:selected').val()=="")){
+		alert("請選擇鄉鎮");
+		return;
+	}
+	
+//	var keyin_text=$(keyin).val();
+	
+	//alert($("#no").val());
+	
+	
+//	var keyin_text=$("#road_big5").val();
+//	
+//	keyin_text=keyin_text==""?$("#keyin").val():keyin_text;
+	
+	var keyin_text=$("#keyin").val();
+	
+	if(keyin_text=="")
+	{
+		alert("請輸入查詢門牌");
+		return;
+	}
+	
+	var city=$(country).find('option:selected').val();
+	var town=$(area).find('option:selected').val();
+	var road_utf8=$("#road").find('option:selected').text();
+//	if(road_utf8!=''){
+//		road_utf8=$("#keyin").val().replace($("#road").find('option:selected').val(), $("#road").find('option:selected').text());
+//	}else{
+		road_utf8=$("#keyin").val();
+//	}
+	//road_utf8=road_utf8==""?$("#keyin").val():road_utf8;
+	catchDoorList(city,town,keyin_text,road_utf8);
+
+}
+
+function catchDoorList(city,town,road,road_utf8){
+//	alert('city:'+city+',town:'+town+',road:'+road);
+//	var get_road=$("#road").find('option:selected').text();
+//	if(get_road!='')
+//		road=road.replace($("#road").find('option:selected').val(), $("#road").find('option:selected').text());
+	//alert(road_utf8);
+	$.ajax({
+		url: "./Road_getDoorInfo",
+		type: "POST",
+		data:{city_code:city,town_code:town,road:road,qry_road:road,qid:ensid,qry_roadutf8:road_utf8},
+		error: function(xhr) {
+			alert('門牌讀取失敗');
+			hideSendMsg();
+	    },
+	    beforeSend:function(){
+	    	showSendMsg("資料讀取中…");
+		},
+		success: function(response) {
+			hideSendMsg();
+			 switchContent('2');
+			$('.content').html(response);
+			
+		}
+	});
+}
+		
+
+//取得門牌詳細資料
+function catchDoorDetail(city,town,office,sectno,buildno,selected_road,qry_road,selected_roadutf8,qry_roadutf8){
+	showSendMsg('查詢中…');
+	$.ajax({
+		url: "./Road_getDoorDetail",
+		type: "POST",
+		data:{city_code:city,town_code:town,road:selected_road,qry_road:qry_road,road_utf8:selected_roadutf8,qry_roadutf8:qry_roadutf8,uid:enuid,qid:ensid},
+		error: function(xhr) {
+			alert('資料讀取失敗');
+			hideSendMsg();
+	    },
+	    beforeSend:function(){
+	    	
+		},
+		success: function(response) {
+			hideSendMsg();
+			switchContent('2');
+			if(response.search('nodata')!=-1){
+				alert("查無資料");
+			}else{
+			   $('.content').html(response);
+			}
+		}
+	});
+	
+}
+
+
+function doorLandQuery(city,town,sectno,landno){//門牌座落地號查詢標示部
+	headBtnClick('1');
+	var data = new Object();
+	data.city=city;
+	data.town=town;
+	data.sectno=sectno;
+	data.landbuild=landno;
+	data.project='1';
+	data.code='';
+	data.regid='';
+	toGetCmd(data);	
+	data=null;
+}
+
+function doorBuildQuery(city,town,sectno,buildno){//門牌建號查詢建號標示部
+	headBtnClick('1');
+	var data = new Object();
+	data.city=city;
+	data.town=town;
+	data.sectno=sectno;
+	data.landbuild=buildno;
+	data.project='7';
+	data.code='';
+	data.regid='';
+	toGetCmd(data);	
+	data=null;
+}
+
+
+function findDoor(door_select,val){
+	//alert(val);
+	
+//	$(door_select+" option").each(function()
+//	{
+//		
+//		
+//		// Add $(this).val() to your list
+//		//alert(val.indexOf($(this).text()));
+//		if(val.search($(this).text())!=-1)
+//		val=$(this).val();
+//    });
+	
+	//alert(val);
+	$(door_select).val(val);
+	
+	s_road=$(door_select).val();
+	$("#road_big5").val(val);
+}
+
+
+
+function doorQry(){
+	var addr_utf8=$("#road").find('option:selected').val();
+	var addr=$("#door_text").val();
+	if(addr==""){
+		alert('請輸入門牌');
+		return;
+	}
+	$.ajax({
+		url: "./Qry_QryTgosDoor.action",
+		type: "POST",
+		dataType: "json",
+		data:{adr:addr},
+		error: function(xhr) {
+			hideSendMsg();
+			alert('資料讀取失敗');
+	    },
+	    beforeSend:function(){
+	    	showSendMsg('查詢中…');
+		},
+		success: function(data) {
+		
+			if(data.length==0){
+				hideSendMsg();
+				alert('查無資料');
+				return;
+			}
+			
+			$( "#dialog-location" ).dialog('close');
+			hideSendMsg();
+			var str_h = "<ul class=\"nav\">";
+			var str_b = "";
+			var str_f = "</ul>";
+			$.each(data, function(i, m) {
+				str_b+="<li><a href=\"#\" onClick=\"locateDoor('"+m.FULL_ADDR+"','"+m.X+"','"+m.Y+"')\">"+m.FULL_ADDR+"</a></li>";
+			});
+			
+			$( "#dialog-door-result" ).dialog('open');
+			$('#door_list').html(str_h+str_b+str_f);
+			
+		}
+	});
+}
+
+function locateDoor(addr,x,y){
+	toLocate(x,y,addr);
+	try{
+	    setGpsQuery(parseFloat(x),parseFloat(y));
+	}catch(e){
+		console.log(e);
+	}
+	$( "#dialog-door-result" ).dialog('close');
+}

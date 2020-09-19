@@ -1,0 +1,100 @@
+.treeview, .treeview ul { 
+	padding: 0;
+	margin: 0;
+	list-style: none;
+}
+
+.treeview ul {
+	background-color: transparent;
+	margin-top: 4px;
+}
+
+.treeview .hitarea {
+	background: url(../../images/tradevan/treeview-default.gif) -64px -25px no-repeat;
+	height: 16px;
+	width: 16px;
+	margin-left: -16px;
+	float: left;
+	cursor: pointer;
+}
+/* fix for IE6 */
+* html .hitarea {
+	display: inline;
+	float:none;
+}
+
+.treeview li { 
+	margin: 0;
+	padding: 3px 0pt 3px 16px;
+}
+
+.treeview a.selected {
+	background-color: #eee;
+}
+
+#treecontrol { margin: 1em 0; display: none; }
+
+.treeview .hover { color: red; cursor: pointer; }
+
+.treeview li { background: url(../../images/tradevan/treeview-default-line.gif) 0 0 no-repeat; }
+.treeview li.collapsable, .treeview li.expandable { background-position: 0 -176px; }
+
+.treeview .expandable-hitarea { background-position: -80px -3px; }
+
+.treeview li.last { background-position: 0 -1766px }
+.treeview li.lastCollapsable, .treeview li.lastExpandable { background-image: url(../../images/tradevan/treeview-default.gif); }  
+.treeview li.lastCollapsable { background-position: 0 -111px }
+.treeview li.lastExpandable { background-position: -32px -67px }
+
+.treeview div.lastCollapsable-hitarea, .treeview div.lastExpandable-hitarea { background-position: 0; }
+
+.treeview-red li { background-image: url(../../images/tradevan/treeview-red-line.gif); }
+.treeview-red .hitarea, .treeview-red li.lastCollapsable, .treeview-red li.lastExpandable { background-image: url(../../images/tradevan/treeview-red.gif); } 
+
+.treeview-black li { background-image: url(../../images/tradevan/treeview-black-line.gif); }
+.treeview-black .hitarea, .treeview-black li.lastCollapsable, .treeview-black li.lastExpandable { background-image: url(../../images/tradevan/treeview-black.gif); }  
+
+.treeview-gray li { background-image: url(../../images/tradevan/treeview-gray-line.gif); }
+.treeview-gray .hitarea, .treeview-gray li.lastCollapsable, .treeview-gray li.lastExpandable { background-image: url(../../images/tradevan/treeview-gray.gif); } 
+
+.treeview-famfamfam li { background-image: url(../../images/tradevan/treeview-famfamfam-line.gif); }
+.treeview-famfamfam .hitarea, .treeview-famfamfam li.lastCollapsable, .treeview-famfamfam li.lastExpandable { background-image: url(../../images/tradevan/treeview-famfamfam.gif); } 
+
+.filetree li { padding: 3px 0 2px 16px; }
+.filetree span.folder, .filetree span.file { padding: 1px 0 1px 16px; display: block; }
+.filetree span.folder { background: url(../../images/folder.gif) 0 0 no-repeat; }
+.filetree li.expandable span.folder { background: url(../../images/tradevan/folder-closed.gif) 0 0 no-repeat; }
+.filetree span.file { background: url(../../images/tradevan/file.gif) 0 0 no-repeat; }
+.filetree span.folder1 { background: url(../../images/tradevan/tree/door.png) 0 0 no-repeat;text-align: left; }
+.filetree span.file1 { background: url(../../images/tradevan/tree/door.png) 0 0 no-repeat;text-align: left; }
+.filetree span.folder1,.filetree span.file1 { padding: 1px 0 1px 16px; display: block; }
+
+.filetree span.index_top_folder { background: url(../../images/tradevan/tree/transmutation.png) 0 0 no-repeat; text-align: left;}
+.filetree span.index_folder { background: url(../../images/tradevan/tree/list.png) 0 0 no-repeat; text-align: left;}
+.filetree span.index_file { background: url(../../images/tradevan/tree/index.png) 0 0 no-repeat; text-align: left;}
+.filetree span.index_folder,.filetree span.index_file{ padding: 1px 0 1px 16px; display: block; }
+.filetree span.index_top_folder,.filetree span.index_file{ padding: 1px 0 1px 16px; display: block; }
+
+.filetree span.land_folder { background: url(../../images/tradevan/tree/Land_building.png) 0 0 no-repeat; text-align: left;}
+.filetree span.land_folder { padding: 1px 0 1px 16px; display: block; }
+
+.filetree span.build_folder { background: url(../../images/tradevan/tree/build.png) 0 0 no-repeat; text-align: left;}
+.filetree span.build_folder{ padding: 1px 0 1px 16px; display: block; }
+
+.filetree span.marked_folder { background: url(../../images/tradevan/tree/marked.png) 0 0 no-repeat; text-align: left;}
+.filetree span.marked_folder{ padding: 1px 0 1px 16px; display: block; }
+
+.filetree span.owner_folder { background: url(../../images/tradevan/tree/owner.png) 0 0 no-repeat; text-align: left;}
+.filetree span.owner_folder{ padding: 1px 0 1px 16px; display: block; }
+
+.filetree span.other_folder { background: url(../../images/tradevan/tree/other.png) 0 0 no-repeat; text-align: left;}
+.filetree span.other_folder{ padding: 1px 0 1px 16px; display: block; }
+
+.filetree span.map_folder { background: url(../../images/tradevan/tree/land.png) 0 0 no-repeat; text-align: left;}
+.filetree span.map_folder{ padding: 1px 0 1px 16px; display: block; }
+
+.filetree span.ref_folder { background: url(../../images/tradevan/tree/top.png) 0 0 no-repeat; text-align: left;}
+.filetree span.ref_folder{ padding: 1px 0 1px 16px; display: block; }
+
+.filetree span.goals_folder { background: url(../../images/tradevan/tree/goals.png) 0 0 no-repeat; text-align: left;}
+.filetree span.goals_folder{ padding: 1px 0 1px 16px; display: block; }

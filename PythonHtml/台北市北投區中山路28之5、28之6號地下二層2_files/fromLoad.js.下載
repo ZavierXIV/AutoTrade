@@ -1,0 +1,608 @@
+var s_city='';//記錄選擇的縣市
+var s_town='';//記錄選擇的鄉鎮
+var s_sectno='';//記錄段代碼
+var s_road='';
+
+function getCity(deftext,target){
+	
+	var select_id=$("#menu_btn li.active").attr('id');
+	var url='./SetZip_cityList';
+	$.ajax( {
+		type : "POST",
+		url: url,
+		data:{select_id:select_id},
+		dataType : "json",
+		error : function(xhr) {
+			$(target).empty();
+			$(target).append($("<option></option>").attr("value","").text(deftext)); 
+		},
+		beforeSend : function() {
+			$(target).empty();
+			$(target).append($("<option></option>").attr("value","").text("讀取中...")); 	
+		},
+		success : function(data) {
+			
+			$(target).empty();
+			$(target).append($("<option></option>").attr("value","").text(deftext)); 
+			$.each(data, function(i, m) {
+				$(target).append($("<option></option>").attr("value",m.code).text(m.title));
+				if(data.length==1){//只有一個時自動選取
+					s_city=m.code;
+					getTown(s_city,'請選擇', '.township');
+					getCityScope(s_city);
+				}
+			});
+			if(s_city!='')
+				$(target).val(s_city);
+			if(init_city!=''){
+				$(target).val(init_city);
+				s_city=init_city;
+				init_city="";
+				
+			}
+				
+		}
+	});
+	
+
+}
+
+function getTown(city_code,deftext,target){
+
+	if(city_code=="")
+	{
+		$(target).empty();
+		$(target).append($("<option></option>").attr("value","").text(deftext)); 
+	return;
+	}
+	var url='./SetZip_townList';
+	$.ajax( {
+		type : "POST",
+		data:{city_code:city_code},
+		url: url,
+		dataType : "json",
+		error : function(xhr) {
+			$(target).empty();
+		},
+		beforeSend : function() {
+			$(target).empty();
+			$(target).append($("<option></option>").attr("value","").text("讀取中...")); 
+			
+		},
+		success : function(data) {
+			$(target).empty();
+			$(target).append($("<option></option>").attr("value","").text(deftext)); 
+			$.each(data, function(i, m) {
+				$(target).append($("<option></option>").attr("value",m.code).text(m.title)); 
+			});
+			//alert(s_town);
+			if(s_town!='')
+				$(target).val(s_town);
+			//getRareWords(target,city_code);
+//			$(".country").css("font-family","\'"+city_code+"font\'");
+//			$(".township").css("font-family","\'"+city_code+"font\'");
+//			$(".section").css("font-family","\'"+city_code+"font\'");
+			 //InitialCssByCss("#rec_list",city_code);
+		}
+	});
+	
+
+}
+
+
+function getTownWithCallback(city_code,deftext,target,callback){//發現自動選單會沒有載完鄉鎮就取值暫時用這個處理2019.07.05
+
+	if(city_code=="")
+	{
+		$(target).empty();
+		$(target).append($("<option></option>").attr("value","").text(deftext)); 
+	return;
+	}
+	var url='./SetZip_townList';
+	$.ajax( {
+		type : "POST",
+		data:{city_code:city_code},
+		url: url,
+		dataType : "json",
+		error : function(xhr) {
+			$(target).empty();
+		},
+		beforeSend : function() {
+			$(target).empty();
+			$(target).append($("<option></option>").attr("value","").text("讀取中...")); 
+			
+		},
+		success : function(data) {
+			$(target).empty();
+			$(target).append($("<option></option>").attr("value","").text(deftext)); 
+			$.each(data, function(i, m) {
+				$(target).append($("<option></option>").attr("value",m.code).text(m.title)); 
+			});
+			if(s_town!='')
+				$(target).val(s_town);
+			callback();
+		}
+	});
+	
+
+}
+
+function getSect(city_code,town_code,deftext,target){
+	var url='./SetZip_sectList';
+	$.ajax( {
+		type : "POST",
+		data:{city_code:city_code,town_code:town_code},
+		url: url,
+		dataType : "json",
+		error : function(xhr) {
+			$(target).empty();
+		},
+		beforeSend : function() {
+			$(target).empty();
+			$(target).append($("<option></option>").attr("value","").text("讀取中...")); 
+			
+		},
+		success : function(data) {
+			$(target).empty();
+			$(target).append($("<option></option>").attr("value","").text(deftext)); 
+			$.each(data, function(i, m) {
+				$(target).append($("<option></option>").attr("value",m.value).text(m.text)); 
+			});
+			if(s_sectno!='')
+				$(target).val(s_sectno);
+
+//			getRareWords(target,city_code);
+//			 InitialCssByCss(".section",city_code);
+			
+		}
+	});
+}
+
+function changeSectionCode(source, target){
+	$(target).val($(source).find('option:selected').val());
+}
+
+function keySection(city,town,sectno_text,target){
+	var city_code=$(city).val();
+	var town_code=$(town).val();
+	var sectno=$(sectno_text).val();
+	if(sectno=="")
+	return;	
+	
+	if(sectno.length!=4){
+		sectno=addZero(4,sectno);
+		$(sectno_text).val(sectno);
+	}
+	
+//	if(town_code!=""){
+//		if(!chkSelectVal(target,sectno))
+//		{
+//			alert('找不到相對應的段代碼');
+//			$(sectno_text).val('');
+//			$(target ).val('');
+//			return;
+//		}
+//		$(target ).val(sectno);
+//		return;	
+//	}
+	
+	
+	
+	if(city_code=="")
+	{
+		alert("請選擇縣市");
+		$(sectno_text).val('');
+		return;
+	}	
+	var url='./SetZip_keyInSectList';
+	$.ajax( {
+		type : "POST",
+		data:{city_code:city_code,town_code:town_code,sectno:sectno},
+		url: url,
+		dataType : "json",
+		error : function(xhr) {
+			$(target).empty();
+			alert("取從地段名稱錯誤");
+			$(sectno_text).val('');
+		},
+		beforeSend : function() {
+			//$('#'+target).empty();
+			//$('#'+target).append($("<option></option>").attr("value","").text("讀取中...")); 
+			
+		},
+		success : function(data) {
+			var result=data.result;
+			var same_sect=data.same_sect;
+			var find_town=data.find_town;
+			var datas=data.sects;
+			
+			if(result=="nodata"){
+				alert("無法找到輸入的段號");
+				s_town='';
+				getTown(city_code,'請選擇', '.township');
+				$('.township').val('');
+				$('.section').empty();
+				$('.section').append($("<option></option>").attr("value","").text("請選擇地段")); 
+				$(sectno_text).val('');
+				return;
+			}else if(result=="same"){
+				alert('找到相同段代碼:\n\n'+same_sect);
+				s_town='';
+				getTown(city_code,'請選擇', '.township');
+				$('.township').val('');
+				$('.section').empty();
+				$('.section').append($("<option></option>").attr("value","").text("請選擇地段")); 
+				$(sectno_text).val('');
+			}else{
+				
+				$(town).val(find_town);
+				$(target).empty();
+				$(target).append($("<option></option>").attr("value",'').text('請選擇地段')); 
+				$.each(datas, function(i, m) {
+					$(target).append($("<option></option>").attr("value",m.value).text(m.text)); 
+				});
+				$(target ).val(sectno);
+				s_town=find_town;
+				s_sectno=sectno;
+			}
+			//getRareWords(target,city_code);
+		
+		}
+	});
+	
+}
+
+function chkSelectVal(id,val){
+    var find=false;
+	$(id+' option').each(function()
+	{
+	    if($(this).val()==val){
+	    	 find=true;
+	    	 return false;
+	    }
+	});
+	return find;
+}
+
+
+function changeTownRoad(country, area, target){//鄉鎮下拉找路名
+	
+	var city=$(country).find('option:selected').val();
+	
+	
+	var town=$(area).find('option:selected').val();
+	var area_select=$(area).find('option:selected').val();
+	if(area_select=="")// 代表沒選鄉鎮
+	return;
+	catchRoadSelect(city,town,target);
+//	$(target).empty();
+//	if(city != null){
+//	$.ajax({
+//		type: "POST",
+//		url: "./Road_roadList",
+//		dataType : "json",
+//		data:{city_code:city,town_code:town},
+//		error: function(xhr) {
+//			alert("道路讀取失敗");
+//	    },
+//	    beforeSend:function(){
+//			$(target).empty();
+//			$(target).append($("<option></option>").attr("value","").text("讀取中...")); 
+//		},
+//		success: function(datas) {
+//			$(target).empty();
+//			$(target).append($("<option></option>").attr("value","").text("請選擇路名"));
+//			$.each(datas, function(i, m) {
+//				$(target).append($("<option></option>").attr("value",m.value).text(m.text)); 
+//			});
+////			$(target).combobox({ valueField:'id',
+////			    textField:'text'});
+//		
+//			}
+//
+//		});
+//		}
+}
+
+function catchRoadSelect(city,town,target){
+	if(town.length==3)
+	{
+		city=town.substring(0,1);
+		town=town.substring(1);
+	}
+	if(city != null){
+		$.ajax({
+			type: "POST",
+			url: "./Road_roadList",
+			dataType : "json",
+			data:{city_code:city,town_code:town},
+			error: function(xhr) {
+				alert("道路讀取失敗");
+		    },
+		    beforeSend:function(){
+				$(target).empty();
+				$(target).append($("<option></option>").attr("value","").text("讀取中...")); 
+			},
+			success: function(datas) {
+				$(target).empty();
+				$(target).append($("<option></option>").attr("value","").text("請選擇路名"));
+				$.each(datas, function(i, m) {
+					$(target).append($("<option></option>").attr("value",m.value).text(m.text)); 
+				});
+//				$(target).combobox({ valueField:'id',
+//				    textField:'text'});
+				if(s_road!=''){
+				$("#road").val(s_road);
+				changeLane('.country','.township','#road','.tunnel_doorname');//自動讀取巷
+				 readDoorEnter();
+				}
+//				getRareWords(target,city);
+				 InitialCssByCss(".select_box",city);
+				}
+			});
+	}
+	
+}
+
+
+function changeLane(country, area, road, target){//
+	//縣市合併	
+	var city=$(country).find('option:selected').val();
+	var town=$(area).find('option:selected').val();
+	if(town.length==3)
+	{
+		city=town.substring(0,1);
+		town=town.substring(1);
+	}
+	//縣市合併	
+	$(target).empty();
+$.ajax({
+	type: "POST",
+	url: "./Road_laneList",
+	dataType : "json",
+	data:{city_code:city,town_code:town,road:$(road).find('option:selected').text()},
+	error: function(xhr) {
+		alert("巷讀取失敗");
+    },
+    beforeSend:function(){
+		$(target).empty();
+		$(target).append($("<option></option>").attr("value","").text("讀取中..."));
+	},
+	success: function(datas) {
+		$(target).empty();
+		$(target).append($("<option></option>").attr("value","").text("巷"));
+//		$('#alley_doorname').empty();
+//		$('#alley_doorname').append($("<option></option>").attr("value","").text("弄"));
+		$(road+"_text").val($(road).find('option:selected').text());
+		
+		$.each(datas, function(i, m) {
+			$(target).append($("<option></option>").attr("value",m.value+'巷').text(m.text+'巷')); 
+		});
+
+	}
+});
+
+}
+
+function changeAlley(country, area, road,lane, target){
+	//縣市合併	
+	var city=$(country).find('option:selected').val();
+	var town=$(area).find('option:selected').val();
+	if(town.length==3)
+	{
+		city=town.substring(0,1);
+		town=town.substring(1);
+	}
+	//縣市合併	
+$.ajax({
+	type: "POST",
+	url: "./Road_alleyList",
+	dataType : "json",
+	data:{city_code:city,town_code:town,road:$(road).find('option:selected').text(),lane:$(lane).find('option:selected').text()},
+	error: function(xhr) {
+		alert("弄讀取失敗");
+    },
+    beforeSend:function(){
+		$(target).empty();
+		$(target).append($("<option></option>").attr("value","").text("讀取中...")); 
+
+	},
+	success: function(datas) {
+		$(target).empty();
+		$(target).append($("<option></option>").attr("value","").text("弄"));
+		$.each(datas, function(i, m) {
+			$(target).append($("<option></option>").attr("value",m.value+'弄').text(m.text+'弄')); 
+		});
+	}
+});
+
+}
+
+
+function getOffice(city,deftext,target){
+	if((city==undefined)||(city==''))
+	{
+		$(target).empty();
+		$(target).append($("<option></option>").attr("value","").text(deftext)); 
+		$('#sCaseYear').empty();
+		$('#sCaseYear').append($("<option></option>").attr("value","").text(deftext)); 
+		return;
+	}
+	var url='./SetZip_officeList';
+	$.ajax( {
+		type : "POST",
+		url: url,
+		data:{city_code:city},
+		dataType : "json",
+		error : function(xhr) {
+			$(target).empty();
+			$(target).append($("<option></option>").attr("value","").text(deftext)); 
+		},
+		beforeSend : function() {
+			$(target).empty();
+			$(target).append($("<option></option>").attr("value","").text("讀取中...")); 	
+		},
+		success : function(data) {
+			$('#sCaseYear').empty();
+			$('#sCaseYear').append($("<option></option>").attr("value","").text(deftext)); 
+			$(target).empty();
+			$(target).append($("<option></option>").attr("value","").text(deftext)); 
+			$.each(data, function(i, m) {
+				$(target).append($("<option></option>").attr("value",m.code).text(m.title)); 
+			});	
+		}
+	});
+	
+
+}
+
+function getCase(city,office,deftext,target){
+	
+	var type=$("input[name='case_city_r']:checked").val();
+	
+	if(type!="single")
+		return;
+	
+	if((city==undefined)||(city==''))
+		return;
+	if((office==undefined)||(office==''))
+		return;
+	var url='./SetZip_caseList';
+	$.ajax( {
+		type : "POST",
+		url: url,
+		data:{city_code:city,office:office},
+		dataType : "json",
+		error : function(xhr) {
+			$(target).empty();
+			$(target).append($("<option></option>").attr("value","").text(deftext)); 
+		},
+		beforeSend : function() {
+			$(target).empty();
+			$(target).append($("<option></option>").attr("value","").text("讀取中...")); 	
+		},
+		success : function(data) {
+			$(target).empty();
+			$(target).append($("<option></option>").attr("value","").text(deftext)); 
+			$.each(data, function(i, m) {
+				$(target).append($("<option></option>").attr("value",m.value).text(m.value+m.text)); 
+			});	
+		}
+	});
+	
+
+}
+
+function getCaseByCity(city,filter_city,office,deftext,target){
+	
+//
+//	if((filter_city==undefined)||(filter_city=='')){
+//		alert('請選擇縣市');
+//		return;
+//}
+	
+	if((city==undefined)||(city=='')){
+		//alert('請選擇縣市');
+		return;
+}
+	if((office==undefined)||(office=='')){
+		alert('請選擇地所');
+		return;
+}
+	var url='./SetZip_caseListByCity';
+	$.ajax( {
+		type : "POST",
+		url: url,
+		data:{city_code:city,filter_city:filter_city,office:office},
+		dataType : "json",
+		error : function(xhr) {
+			$(target).empty();
+			$(target).append($("<option></option>").attr("value","").text(deftext)); 
+		},
+		beforeSend : function() {
+			$(target).empty();
+			$(target).append($("<option></option>").attr("value","").text("讀取中...")); 	
+		},
+		success : function(data) {
+			$(target).empty();
+			$(target).append($("<option></option>").attr("value","").text(deftext)); 
+			$.each(data, function(i, m) {
+				$(target).append($("<option></option>").attr("value",m.value).text(m.value+m.text)); 
+			});	
+		}
+	});
+	
+
+}
+
+
+function readRecSelect(){//載入所選項目
+	//alert(s_city+','+s_town+','+s_sectno);
+	if(s_city=='')
+	return;
+	
+	getTownWithCallback(s_city,'請選擇', '.township',toReadRecSelect)
+	
+//	getTown(s_city,'請選擇', '.township');//原本的碼
+
+
+}
+
+function toReadRecSelect(){
+	
+	 if ($("#office").length > 0) {
+		if(s_city!='')
+		getOffice(s_city,"請選擇","#office");
+	}
+	
+	if(s_town=='')
+	return;
+
+if ($("#road").length > 0) {
+	catchRoadSelect(s_city,s_town, '#road');
+}else{
+    getSect(s_city,s_town, '請選擇地段', '.section');
+}
+
+if(s_sectno=='')
+	return;
+
+$('.sectioncode').val(s_sectno);
+	
+}
+
+
+function getCityScope(city){
+	
+	if (! $("#home_map").is(':visible') )
+	return;
+	
+	var url='./Qry_getCityScope';
+	$.ajax( {
+		type : "POST",
+		url: url,
+		data:{city:city},
+		dataType : "json",
+		error : function(xhr) {
+			hideSendMsg();
+		},
+		beforeSend : function() {
+			showSendMsg('讀取中…');
+		},
+		success : function(data) {
+			
+			var textent =ol.proj.transformExtent([data.minX, data.minY, data.maxX, data.minY], 'EPSG:4326', 'EPSG:3857');
+			map.getView().fit(textent, map.getSize());
+			
+			 map.once('postrender', function(event) {
+				 
+				 
+				 
+				 hideSendMsg();
+			 });
+		}
+	});
+}
+
+
+

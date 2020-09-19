@@ -1,0 +1,770 @@
+//var mark_img1='images/'+sys_type+'/marker/pos.png';
+window.app = {};
+ var app = window.app;
+ 
+ 
+ app.RotateNorthControl = function(opt_options) {//量距
+	 
+
+     var options = opt_options || {};
+
+     var button = document.createElement('custom_btn');
+     button.innerHTML = '';
+     
+     var buttonTipLabel = options.buttonTipLabel ? options.buttonTipLabel : "";
+     
+     button.title = buttonTipLabel;
+
+    // var this_ = this;
+     var handleRotateNorth = function() {
+    	 measure_type='LineString';
+    	 addInteraction();//測量功能初始化
+    	 map.on('pointermove', pointerMoveHandler);//開啟測量
+     };
+
+     button.addEventListener('click', handleRotateNorth, false);
+     button.addEventListener('touchstart', handleRotateNorth, false);
+
+     var element = document.createElement('div');
+     element.className = 'rotate-north ol-unselectable ol-control';
+     element.appendChild(button);
+
+     ol.control.Control.call(this, {
+       element: element,
+       target: options.target
+     });
+
+   };
+   ol.inherits(app.RotateNorthControl, ol.control.Control);
+   
+   
+   
+   app.ShowLandnoControl = function(opt_options) {//圖層
+
+	     var options = opt_options || {};
+	     
+	     var buttonTipLabel = options.buttonTipLabel ? options.buttonTipLabel : "";
+	     
+         var class_name=options.className ? options.className : "";
+	     
+	     var class_custom=options.customClass ? options.customClass : "";
+
+	     var button = document.createElement(class_custom);
+	   
+	     button.innerHTML = '';
+	     	     
+	     button.title = buttonTipLabel;
+
+	     var handleShowLandno = function() {
+	    	
+	    	// alert('地號顯示');
+//	    	 if(show_landno){
+//	    	     show_landno=false;
+//	    	 }else{
+//	    		 show_landno=true;
+//	    	 }
+//	    	 map_vector.setStyle(styleFunction);
+	    	 
+	    	 closeGpsButton();
+	    	 
+	    	 $( "#dialog-layer" ).dialog('open');
+	    	 
+	    	
+	     };
+
+	     button.addEventListener('click', handleShowLandno, false);
+	     //button.addEventListener('touchstart', handleShowLandno, false);
+
+	     var element = document.createElement('div');
+	     element.className = class_name+' ol-unselectable ol-control';
+	     element.appendChild(button);
+
+	     ol.control.Control.call(this, {
+	       element: element,
+	       target: options.target
+	     });
+	     
+	     
+	     
+
+	   };
+	   ol.inherits(app.ShowLandnoControl, ol.control.Control);
+	   
+	   
+	   app.zoomExtendControl = function(opt_options) {//全視景
+
+		     var options = opt_options || {};
+		     var button = document.createElement('custom_btn');
+		     button.innerHTML = '';
+		     
+		     var buttonTipLabel = options.buttonTipLabel ? options.buttonTipLabel : "";
+		     
+		     var action = options.action ? options.action : "";
+		     
+		     button.title = buttonTipLabel;
+
+		     var handlezoomExtend = function() {
+		   
+		    	  
+		    	  if(action=="L"){
+		    		  toZoomExtend(map,map_source);
+		    	  }else{
+		    		  
+//		    		  alert('功能未完成');
+		    		  map.getView().fit(extent,map.getSize());
+		    		  
+		    	  }
+		    	 
+		    	 //toZoomExtend(map,map_source);
+		     };
+
+		     button.addEventListener('click', handlezoomExtend, false);
+		     //button.addEventListener('touchstart', handleShowLandno, false);
+
+		     var element = document.createElement('div');
+		     element.className = 'zoomExtend ol-unselectable ol-control';
+		     element.appendChild(button);
+
+		     ol.control.Control.call(this, {
+		       element: element,
+		       target: options.target
+		     });
+
+		   };
+		   ol.inherits(app.zoomExtendControl, ol.control.Control);
+	   
+	   
+	   
+	   
+	   app.GetPDFControl = function(opt_options) {//多目標PDF地籍圖
+
+		     var options = opt_options || {};
+
+		     var button = document.createElement('custom_btn');
+		     button.innerHTML = 'PDF';
+
+		     var handleGetPDF = function() {
+		    	 
+		    	
+		    	 
+		    	 if(!ask_send){
+		    		 treeMBQuery(pdf_cmd.city,pdf_cmd.town,pdf_cmd.sectno,pdf_cmd.number,pdf_cmd.part,pdf_cmd.paper_size,pdf_cmd.scaleVal,pdf_cmd.print_type,pdf_cmd.digitBuild,pdf_cmd.papersStr);
+		    		 return;
+		    	 }
+		    	 
+		    	
+		    	if((ask_send)&&(confirm("請稍待右側圖形區域的路名顯圖 右側圖形區域的紅色粗框為預定列段範圍 每張【多目標地籍圖】收費二十元，共計"+pdf_cmd.cashPapers+"張 是否確定查詢？"))){
+		    		//getCmdS(pdf_cmd);
+		    		treeMBQuery(pdf_cmd.city,pdf_cmd.town,pdf_cmd.sectno,pdf_cmd.number,pdf_cmd.part,pdf_cmd.paper_size,pdf_cmd.scaleVal,pdf_cmd.print_type,pdf_cmd.digitBuild,pdf_cmd.papersStr);
+		    		ask_send=false;
+		    	}else{
+		    		return;
+		    	}
+		    	
+		     };
+
+		     button.addEventListener('click', handleGetPDF, false);
+		     //button.addEventListener('touchstart', handleShowLandno, false);
+
+		     var element = document.createElement('div');
+		     element.className = 'get-PDF ol-unselectable ol-control';
+		     element.appendChild(button);
+
+		     ol.control.Control.call(this, {
+		       element: element,
+		       target: options.target
+		     });
+
+		   };
+		   ol.inherits(app.GetPDFControl, ol.control.Control);
+		   
+		   
+		   
+		   app.SaveDXFControl = function(opt_options) {//存DXF
+
+			     var options = opt_options || {};
+
+			     var button = document.createElement('custom_btn');
+			     button.innerHTML = '';
+			     
+			     var buttonTipLabel = options.buttonTipLabel ? options.buttonTipLabel : "";
+			     
+			     button.title = buttonTipLabel;
+			     
+			     var action = options.action ? options.action : "";
+			     
+			     var class_name=options.className ? options.className : "";
+
+			    // var this_ = this;
+			     var saveDxf = function() {
+			    	 if(action=="L"){
+			    	 $( "#dialog-map" ).dialog('open');
+			    	 }else{
+//			    		 alert(simage_url);
+//			    		 var image = new Image();
+//			    	        image.src = simage_url;
+//			    	        image.onload = function() {
+//			    	            window.open(image.src,"Image","width="+image.width+",height="+image.height);
+//			    	        };
+			    		 
+			    		 window.open(simage_url,"_blank","toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=no, resizable=yes, copyhistory=yes, width=640, height=480");
+			    	 }
+			     };
+
+			     button.addEventListener('click', saveDxf, false);
+			     button.addEventListener('touchstart', saveDxf, false);
+
+			     var element = document.createElement('div');
+			     element.className = class_name+' ol-unselectable ol-control';
+			     element.appendChild(button);
+
+			     ol.control.Control.call(this, {
+			       element: element,
+			       target: options.target
+			     });
+
+			   };
+	     ol.inherits(app.SaveDXFControl, ol.control.Control);
+	     
+	     
+	     
+	     app.SaveImgControl = function(opt_options) {//存圖片
+
+		     var options = opt_options || {};
+
+		     var button = document.createElement('custom_btn');
+		     button.innerHTML = '下載';
+
+		    // var this_ = this;
+		     var saveImg = function() {
+		    	//alert('存Image');
+		    	getPdfDxf(DLData);
+		     };
+
+		     button.addEventListener('click', saveImg, false);
+		     button.addEventListener('touchstart', saveImg, false);
+
+		     var element = document.createElement('div');
+		     element.className = 'saveImg ol-unselectable ol-control';
+		     element.appendChild(button);
+
+		     ol.control.Control.call(this, {
+		       element: element,
+		       target: options.target
+		     });
+
+		   };
+     ol.inherits(app.SaveImgControl, ol.control.Control);
+     
+     
+     app.AllSectControl = function(opt_options) {//全段全幅
+
+	     var options = opt_options || {};
+
+	     var button = document.createElement('custom_btn');
+	     button.innerHTML = '';
+	     
+	     var buttonTipLabel = options.buttonTipLabel ? options.buttonTipLabel : "";
+	     
+	     button.title = buttonTipLabel;
+
+	    // var this_ = this;
+	     var allSect = function() {
+	    	treeQuery(DLData.city,DLData.town,DLData.sectno,DLData.mno+'-'+DLData.cno,DLData.map_type,'','');
+	    	 
+	    	 
+	    	//temp[0]+','+qry_id+waterID+','+temp[2]+','+temp[3]+','+temp[4]+','+temp[5]+','+qry_item+',1';
+	     };
+
+	     button.addEventListener('click', allSect, false);
+	     button.addEventListener('touchstart', allSect, false);
+
+	     var element = document.createElement('div');
+	     element.className = 'allSect ol-unselectable ol-control';
+	     element.appendChild(button);
+
+	     ol.control.Control.call(this, {
+	       element: element,
+	       target: options.target
+	     });
+
+	   };
+     ol.inherits(app.AllSectControl, ol.control.Control);
+     
+     
+     app.RentSelectControl = function(opt_options) {//框選放大
+
+	     var options = opt_options || {};
+	     
+	     var buttonTipLabel = options.buttonTipLabel ? options.buttonTipLabel : "";
+	     
+         var class_name=options.className ? options.className : "";
+	     
+	     var class_custom=options.customClass ? options.customClass : "";
+
+	     var button = document.createElement(class_custom);
+	     button.innerHTML = '';
+	     
+	   
+	     
+	     button.title = buttonTipLabel;
+	   
+	    // var this_ = this;
+	     var RentSelect = function() {
+	    	 closeGpsButton();
+	    	   setMapCursor("se-resize");
+	    	   map.addInteraction(selectInteraction);
+               map.addInteraction(dragBoxInteraction);
+	     };
+
+	     button.addEventListener('click', RentSelect, false);
+	     button.addEventListener('touchstart', RentSelect, false);
+
+	     var element = document.createElement('div');
+	     element.className = class_name+' ol-unselectable ol-control';
+	     element.appendChild(button);
+
+	     ol.control.Control.call(this, {
+	       element: element,
+	       target: options.target
+	     });
+
+	   };
+     ol.inherits(app.RentSelectControl, ol.control.Control);
+     
+     
+     
+     app.AreaControl = function(opt_options) {//面積測量
+
+	     var options = opt_options || {};
+
+	     var button = document.createElement('custom_btn');
+	     button.innerHTML = '';
+	     
+	     var buttonTipLabel = options.buttonTipLabel ? options.buttonTipLabel : "";
+	     
+	     button.title = buttonTipLabel;
+
+	    // var this_ = this;
+	     var area_tool = function() {
+	    	 measure_type='Polygon';
+	    	 addInteraction();//測量功能初始化
+	    	 map.on('pointermove', pointerMoveHandler);//開啟測量
+	     };
+
+	     button.addEventListener('click', area_tool, false);
+	     button.addEventListener('touchstart', area_tool, false);
+
+	     var element = document.createElement('div');
+	     element.className = 'Area ol-unselectable ol-control';
+	     element.appendChild(button);
+
+	     ol.control.Control.call(this, {
+	       element: element,
+	       target: options.target
+	     });
+
+	   };
+     ol.inherits(app.AreaControl, ol.control.Control);
+     
+     
+     app.kmlControl = function(opt_options) {//自有的kml.shp檔上傳
+
+	     var options = opt_options || {};
+
+	     var button = document.createElement('custom_btn');
+	     button.innerHTML = '';
+	     
+	     var buttonTipLabel = options.buttonTipLabel ? options.buttonTipLabel : "";
+	     
+	     button.title = buttonTipLabel;
+
+	    // var this_ = this;
+	     var kml_tool = function() {
+	    	// $( "#dialog-upload" ).dialog('open');暫時關閉
+	     };
+
+	     button.addEventListener('click', kml_tool, false);
+	     button.addEventListener('touchstart', kml_tool, false);
+
+	     var element = document.createElement('div');
+	     element.className = 'Kml ol-unselectable ol-control';
+	     element.appendChild(button);
+
+	     ol.control.Control.call(this, {
+	       element: element,
+	       target: options.target
+	     });
+
+	   };
+     ol.inherits(app.kmlControl, ol.control.Control);
+     
+     
+     app.gpsControl = function(opt_options) {//gps定位
+    	
+	     var options = opt_options || {};
+	     
+	     var buttonTipLabel = options.buttonTipLabel ? options.buttonTipLabel : "";
+	     
+	     var class_name=options.className ? options.className : "";
+	     
+	     var class_custom=options.customClass ? options.customClass : "";
+
+	     var button = document.createElement(class_custom);
+	     button.innerHTML = '';
+	     
+	    
+	     button.title = buttonTipLabel;
+
+	    // var this_ = this;
+	     var gps_btn = function() {
+//	    	alert('gps未完成');
+	    	 closeGpsButton();
+	    	 toGPS(); 		    	
+	     };
+
+	     button.addEventListener('click', gps_btn, false);
+	     button.addEventListener('touchstart', gps_btn, false);
+
+	     var element = document.createElement('div');
+	     element.className = class_name+' ol-unselectable ol-control';
+	     element.appendChild(button);
+
+	     ol.control.Control.call(this, {
+	       element: element,
+	       target: options.target
+	     });
+
+	   };
+     ol.inherits(app.gpsControl, ol.control.Control);
+     
+     
+     
+     app.EdocControl = function(opt_options) {//騰本
+
+	     var options = opt_options || {};
+
+	     var button = document.createElement('custom_btn2');
+	     button.innerHTML = '';
+	     
+	     var buttonTipLabel = options.buttonTipLabel ? options.buttonTipLabel : "";
+	     
+	     button.title = buttonTipLabel;
+
+	    // var this_ = this;
+	     var edoc_btn = function() {
+	    	//alert('騰本尚未完成');
+	    	sendEdoc(DLData);
+	     };
+
+	     button.addEventListener('click', edoc_btn, false);
+	     button.addEventListener('touchstart', edoc_btn, false);
+
+	     var element = document.createElement('div');
+	     element.className = 'Edoc ol-unselectable ol-control';
+	     element.appendChild(button);
+
+	     ol.control.Control.call(this, {
+	       element: element,
+	       target: options.target
+	     });
+
+	   };
+     ol.inherits(app.EdocControl, ol.control.Control);
+     
+     
+     app.G158Control = function(opt_options) {//樂活網
+
+	     var options = opt_options || {};
+
+	     var button = document.createElement('custom_btn2');
+	     button.innerHTML = '';
+	     
+	     var buttonTipLabel = options.buttonTipLabel ? options.buttonTipLabel : "";
+	     
+	     button.title = buttonTipLabel;
+
+	    // var this_ = this;
+	     var g158_btn = function() {
+	    	//alert('樂活尚未完成:'+DLData);
+	    	 openInterfacing(DLData,'GIS158');
+	     };
+
+	     button.addEventListener('click', g158_btn, false);
+	     button.addEventListener('touchstart', g158_btn, false);
+
+	     var element = document.createElement('div');
+	     element.className = 'G158 ol-unselectable ol-control';
+	     element.appendChild(button);
+
+	     ol.control.Control.call(this, {
+	       element: element,
+	       target: options.target
+	     });
+
+	   };
+     ol.inherits(app.G158Control, ol.control.Control);
+     
+     
+     app.TaoBaoControl = function(opt_options) {//桃寶網
+
+	     var options = opt_options || {};
+
+	     var button = document.createElement('custom_btn2');
+	     button.innerHTML = '';
+	     
+	     var buttonTipLabel = options.buttonTipLabel ? options.buttonTipLabel : "";
+	     
+	     button.title = buttonTipLabel;
+
+	    // var this_ = this;
+	     var TaoBao_btn = function() {
+//	    	alert('桃寶尚未完成');
+	    	 
+	    	 openInterfacing(DLData,'TAOBAO');
+	     };
+
+	     button.addEventListener('click', TaoBao_btn, false);
+	     button.addEventListener('touchstart', TaoBao_btn, false);
+
+	     var element = document.createElement('div');
+	     element.className = 'TaoBao ol-unselectable ol-control';
+	     element.appendChild(button);
+
+	     ol.control.Control.call(this, {
+	       element: element,
+	       target: options.target
+	     });
+
+	   };
+     ol.inherits(app.TaoBaoControl, ol.control.Control);
+     
+     
+     //===============================一毃地圖按鈕===============================
+     
+  
+     var lonLat_btn_ative=false;
+     var temp_evt;
+     var jTarget;
+     app.lonLatControl = function(opt_options) {//經緯度查詢
+
+	     var options = opt_options || {};
+
+	     var button = document.createElement('custom_btn4');
+	     button.innerHTML = '';
+	     
+	     var buttonTipLabel = options.buttonTipLabel ? options.buttonTipLabel : "";
+	     
+	     button.title = buttonTipLabel;
+	     
+	     var lonlat_btn = function() {
+	    	 overlay.setPosition(undefined);
+	    	    var target = map.getTarget();
+	    	    jTarget = typeof target === "string" ? $("#"+target) : $(target);
+	    	    jTarget.css("cursor", "url("+mark_img1+") 15 51,auto");
+	    	    
+	    	   
+	    	 if(!lonLat_btn_ative){
+	    	   $('.gps_set').css('background-image','url("images/'+sys_type+'/mapBtn/gps_o.png")');
+	    	   lonLat_btn_ative=true;
+	    	 }else{
+	    		 $('.gps_set').css('background-image','url("images/'+sys_type+'/mapBtn/gps.png")');
+	    		 lonLat_btn_ative=false;
+	    		 map.unByKey(temp_evt);
+	    		 temp_evt=null;
+	    		 jTarget.css("cursor", "");
+	    		 return;
+	    	 }
+	    	 
+	    		headBtnClick('4');
+	    	
+		    	map.on('click', function(event) {
+		    		//var coord = event.coordinate;
+		    	    
+		    		temp_evt=event;
+		    		var point=ol.proj.transform(event.coordinate, 'EPSG:3857', 'EPSG:4326');
+		    		var WGS84x=point[0];
+		    		var WGS84y=point[1];
+		    		
+		    		var declat=decToDeg(WGS84x);
+		    		var declon=decToDeg(WGS84y);
+		    		
+		    		var g_declat=decToDeg(WGS84x,3);
+		    		var g_declon=decToDeg(WGS84y,3);
+		    		
+		    		
+		    		
+		    		var point_google=WGS84x.toFixed(6)+','+WGS84y.toFixed(6);
+		    		
+		    		var dec_point_google=g_declat+' '+g_declon;
+		    		
+		    		 content.innerHTML = 
+		    			 '<br>'+
+		    			 '<div class="popup_div" align="center">'+
+		    			 '<br>'+
+		    			 '<table border="1" cellpadding="0" cellspacing="0" width="100%" bordercolor="#FFFFFF" sytle="border-radius: 10px;">'+
+		    			 '<TH colspan="4">'+
+		    			 '<center><FONT COLOR="#FFFFFF"><b></b>經緯度資訊</FONT></center>'+
+		    			 '</TH>'+
+		    			 '<tr>'+
+		    			 '<td class="left" width="25%">經度</td>'+
+		    			 '<td class="right">'+WGS84x.toFixed(6)+'</td>'+
+		    			 '<td class="left" width="25%">緯度</td>'+
+		    			 '<td class="right">'+WGS84y.toFixed(6)+'</td>'+
+		    			 '</tr>'+
+//		    			 '<tr>'+
+//		    			 '<td class="left" width="25%">經緯度</td>'+
+//		    			 '<td class="right" colspan="3">'+dec_point_google+'(度分秒)</td>'+
+//		    			 '</tr>'+
+//		    			 '<tr>'+
+		    			 '<td class="left" width="25%">經緯度</td>'+
+		    			 '<td class="right" colspan="3">'+point_google.split(',')[1]+','+point_google.split(',')[0]+'</td>'+
+		    			 '</tr>'+
+		    			 '<tr>'+
+		    			 '<td class="right" colspan="4" align="center">「坐標已帶222入左方<font color="red">經緯度查詢地號</font>功能」</td>'+
+		    			 '</tr>'+
+		    			 '</table>'+
+		    			 
+		    			 '<br>'+
+		    			 '</div>'+
+		    			 '<br>'
+		    			 ;
+		    		overlay.setPosition(event.coordinate);
+		    		//view.setCenter(event.coordinate);
+		    		
+		    		
+//		    		 map.unByKey(event);
+//		    		 jTarget.css("cursor", "");
+		    		 setGpsQuery(WGS84x,WGS84y);
+		    	});
+		    	
+		    };
+
+	     button.addEventListener('click', lonlat_btn, false);
+	     button.addEventListener('touchstart', lonlat_btn, false);
+
+	     var element = document.createElement('div');
+	     element.className = 'gps_set ol-unselectable ol-control';
+	     element.appendChild(button);
+
+	     ol.control.Control.call(this, {
+	       element: element,
+	       target: options.target
+	     });
+
+	   };
+     ol.inherits(app.lonLatControl, ol.control.Control);
+     
+     
+     app.addressControl = function(opt_options) {//門牌定位
+
+	     var options = opt_options || {};
+
+	     var button = document.createElement('custom_btn4');
+	     button.innerHTML = '';
+	     
+	     var buttonTipLabel = options.buttonTipLabel ? options.buttonTipLabel : "";
+	     
+	     button.title = buttonTipLabel;
+	     
+	     var address_btn = function() {
+	    	 closeGpsButton();
+	    		headBtnClick('4');
+		    	$( "#dialog-location" ).dialog('open');
+		    };
+
+	     button.addEventListener('click', address_btn, false);
+	     button.addEventListener('touchstart', address_btn, false);
+
+	     var element = document.createElement('div');
+	     element.className = 'address ol-unselectable ol-control';
+	     element.appendChild(button);
+
+	     ol.control.Control.call(this, {
+	       element: element,
+	       target: options.target
+	     });
+
+	   };
+     ol.inherits(app.addressControl, ol.control.Control);
+     
+     
+     
+     app.cleanMapExtend = function(opt_options) {//清除額外圖層
+
+	     var options = opt_options || {};
+	     var button = document.createElement('custom_btn');
+	     button.innerHTML = '';
+	     
+	     var buttonTipLabel = options.buttonTipLabel ? options.buttonTipLabel : "";
+	     
+	     button.title = buttonTipLabel;
+
+	     var handleClenExtend = function() {
+	    	
+	    	 cleanMapExtent();
+	    	
+	     };
+
+	     button.addEventListener('click', handleClenExtend, false);
+	     button.addEventListener('touchstart', handleClenExtend, false);
+
+	     var element = document.createElement('div');
+	     element.className = 'cleanExtend ol-unselectable ol-control';
+	     element.appendChild(button);
+
+	     ol.control.Control.call(this, {
+	       element: element,
+	       target: options.target
+	     });
+
+	   };
+	   ol.inherits(app.cleanMapExtend, ol.control.Control);
+     
+     
+//     app.pointGPSControl = function(opt_options) {//坐標定位
+//
+//	     var options = opt_options || {};
+//
+//	     var button = document.createElement('custom_btn3');
+//	     button.innerHTML = '';
+//	     
+//	     var buttonTipLabel = options.buttonTipLabel ? options.buttonTipLabel : "";
+//	     
+//	     button.title = buttonTipLabel;
+//	     
+//	     var coord_btn = function() {
+//		    	//alert('坐標定位查詢未完成');
+//	    		headBtnClick('4');
+//		    	 $( "#dialog-lonlat" ).dialog('open');
+//		    	
+//		    };
+//
+//	     button.addEventListener('click', coord_btn, false);
+//	     button.addEventListener('touchstart', coord_btn, false);
+//
+//	     var element = document.createElement('div');
+//	     element.className = 'coordinate ol-unselectable ol-control';
+//	     element.appendChild(button);
+//
+//	     ol.control.Control.call(this, {
+//	       element: element,
+//	       target: options.target
+//	     });
+//
+//	   };
+//     ol.inherits(app.pointGPSControl, ol.control.Control);
+
+
+
+	   function closeGpsButton(){
+		   if(jTarget==null)
+			   return;
+		   $('.gps_set').css('background-image','url("images/'+sys_type+'/mapBtn/gps.png")');
+  		 lonLat_btn_ative=false;
+  		 map.unByKey(temp_evt);
+  		 temp_evt=null;
+  		 jTarget.css("cursor", "");
+  		overlay.setPosition(undefined);
+	   }
+

@@ -1,0 +1,99 @@
+ function selectTree(){
+	 
+	 
+	 
+	    
+	           var sect_text=$( ".section option:selected" ).text();
+	           var qry_type=$("input[name='RadioGroup1']:checked").val();
+	           var type_text=qry_type=="B"?'建號':'地號';
+	           var number;
+	           var select_id=$("#menu_btn li.active").attr('id');
+	           var folder=getFolderClass(select_id,qry_type);
+	           var proj_text=$("#project"+qry_type+" option:selected").text();
+	           proj_text = proj_text.replace('土地', '');
+	           proj_text = proj_text.replace('建物', '');
+	           if(qry_type=='L'){//地號查詢
+	        	   
+	        	   number=parseLandNo8($(".number").val());
+	        	   number=number.substring(0,4)+'-'+number.substring(4);
+
+	           }else{//建號查詢
+	        	   
+	        	   number=parseBuildNo8($(".number").val());
+	        	   number=number.substring(0,5)+'-'+number.substring(5);
+	        	   
+	        	   
+	           }
+	           
+	                      
+	           
+	          $("ul#rec_list").each(function () {
+	          var find_text='';
+	    	  $(this).find('li '+folder).each(function(){
+	    		  find_text=$(this).text();
+	    		  if((find_text.indexOf(sect_text)!=-1)&&(find_text.indexOf(type_text)!=-1)&&(find_text.indexOf(number)!=-1)){
+	    			  
+	    			  clickItem($(this),'collapsable',false);
+	    			  
+//	    			  if($(this).closest('li').attr("class").indexOf('collapsable')==-1){
+//	    				 // menu_click_tree=true;
+//	    			  $(this).click();
+//	    			  }
+	    			
+	    			  
+	    			  //先把所有子項關閉
+	    			  $(this).next().find('li span').each(function(){
+	    				  if(($(this).text().indexOf("所有權部")!=-1)||($(this).text().indexOf("他項權利部")!=-1)){
+	    				  clickItem($(this),'expandable',false);
+	    				  }
+	    			  });
+	    			  //先把所有子項關閉
+	    			  
+	    			  //找子項目打開
+	    			  $(this).next().find('li span').each(function(){
+	    				  
+	    				  if($(this).text().indexOf(proj_text)!=-1){
+	    					  if((proj_text=="所有權部")||(proj_text=="他項權利部")){
+	    						  
+	    						  clickItem($(this),'collapsable',true);
+//	    						  if($(this).closest('li').attr("class").indexOf('collapsable')==-1){
+//	    							  menu_click_tree=true;
+//	    					      $(this).click();
+//	    						  }
+	    					  }
+	    				  }
+	    				 
+	    			  });
+	    			  //找子項目打開
+	    			  
+	    			  
+	    		  }
+	    	  });
+	    	
+	    });
+	          
+	     
+ }
+ 
+ function clickItem(dom,open_close,click){
+	  if((dom.closest('li').attr("class")!=undefined)&&(dom.closest('li').attr("class").indexOf(open_close)==-1)){
+	  //if(dom.closest('li').attr("class").indexOf(open_close)==-1){
+//		  menu_click_tree=click;
+		  dom.click();
+	  } 
+ }
+ 
+ function getFolderClass(tab_id,type){
+	 var folder;
+	 if(tab_id=='hlink1'){
+		 folder=type=="L"?'.land_folder':'.build_folder';
+	 }else if(tab_id=='hlink2'){
+		 
+	 }else if(tab_id=='hlink3'){
+		 folder=type=="L"?'.index_top_folder':'.index_top_folder';
+	 }else if(tab_id=='hlink4'){
+		 
+	 }else{
+	 }
+	 return folder;
+ }

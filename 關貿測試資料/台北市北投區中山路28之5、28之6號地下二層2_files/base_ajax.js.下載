@@ -1,0 +1,566 @@
+var qry_cl;//臺詢類型
+var ownerno_deful;//預設帶入所有權人統編
+var ownerno_edit;//所有權人輸入
+var enuid;
+var ensid;
+var context_path;//列印用到的全域變數
+var base_url;//列印用到的全域變數
+var jversion;
+var print_head;//而列印表頭資訊
+var EDOC_btn;//電子騰本按鈕開關
+var init_city;//下拉選單預設縣市
+var manager;
+var sys_type;//系統區別: 0:中華電信 1:關貿
+var mark_img1;
+//var rwObj;
+var html_title;
+var menu_click_tree=false;
+var timeOut;
+var css_word=true;//是否啟用罕用字css載入方式
+function initSystem(init_data){
+	rec_qry_cl=init_data.qry_cl;//(第一次設定起始值)
+	qry_cl=init_data.qry_cl;
+	context_path=init_data.context_path;
+	base_url=init_data.base_url;
+	jversion=init_data.jversion;
+	EDOC_btn=init_data.EDOC;
+	enuid=init_data.ENUID;
+	ensid=init_data.ENSID;
+	init_city=init_data.init_city;
+	manager=init_data.manager;
+	sys_type=init_data.sys_type;
+	mark_img1='images/'+sys_type+'/marker/pos.png';
+	html_title=init_data.html_title;
+	//2017.10.02 為了判斷一類新增參數
+	ownerno_deful=init_data.ownerno_deful;
+	ownerno_edit=init_data.ownerno_edit;
+	//2017.10.02 為了判斷一類新增參數
+	init_data=null;
+//	try{
+//	 rwObj = new RareWords();
+//	}catch(e){
+//		console.log('罕用字物件初始化失敗:'+e);
+//	}
+	//timeOut=60000;//設定超時60秒
+	//timeOut=120000;//設定超時120秒
+	timeOut=300000;//設定超時5分鐘
+	//alert("screen width:"+screen.width);
+	if(init_city!=""){
+		initFont(init_city);
+	}else{
+	initFont('C');//預設載入第一個縣市
+	}
+	
+}
+
+function toGetCmd(data){
+	  print_head=null;
+	
+	if((data.cl==undefined)||(data.cl==''))//若無設定參數一律以二類來查
+	data.cl='2';
+	
+
+	$.ajax({
+   		type: "POST",
+   		url: './Cmd_getCmd',
+   		dataType : "json",
+   		data:{'project':data.project,'city':data.city,'office':data.office,'town':data.town,'sectno':data.sectno,'landbuild':data.landbuild,'code':data.code,'apply_code':data.apply_code,'sn_type':data.sn_type,'regid':data.regid,'WGS84_x':data.WGS84_x,'WGS84_y':data.WGS84_y,'paper_size':data.paper_size,'scale':data.scale,'print_type':data.print_type,'digitBuild':data.digitBuild,'MBPart':data.MBPart,"caseno":data.caseno,"qry_cl":data.cl,"menu_cl":data.menu_cl,"Sheets":data.Sheets,"uid":enuid,"qid":ensid},
+   		error: function(xhr) {
+   			getCmdF();
+   			hideSendMsg();
+   	    },
+   	    beforeSend : function() {
+   	    	//showSendMsg("查詢中…");
+   	    	showSendMsg("資料讀取中…");
+   		},
+   		success: function(data) {
+   			hideSendMsg();
+   			if(data.is_qry=="timeout")
+   			{
+   				alert('系統已超過閒置時間，請重新登入使用');
+   				window.location.href='./Logout.action';
+   				return;
+   			}
+   			getCmdS(data);
+ 
+   		}
+   	});	
+}
+ 
+ 
+ function getCmdS(cmdData){
+	 temp_cmdData=cmdData;//改成都要記錄2019.03.07
+	 var is_qry=cmdData.is_qry;
+	 if(is_qry=="N"){//代表沒查詢過，要送到webAP取資料
+		 sendData(cmdData);
+	 }else if(is_qry.search('R')!=-1){//重送一二類資料
+		 var type=is_qry=="R1"?"一類":"二類";
+		 if(!confirm("是否要送出"+type+"資料")){
+			 $(".content").empty();
+			return; 
+		 }
+		 sendData(cmdData);
+	 }else{//已查詢過直接抓資料顯示
+		// var type=(cmdData.W).split(",")[6];
+		 getResult(cmdData.filePath,cmdData.W);
+		// if(menu_click_tree){
+		   //selectTree();
+		// }
+	 }
+	 menu_click_tree=false;
+ }
+ 
+ function getCmdF(){
+	 //alert('取得指令失敗');
+	 alert('抱歉，伺服器端取得資料失敗。\n請稍後再試');
+ }
+ 
+// function toSendData(cmdData){
+//	 
+//	 $.ajax({
+//			url: "./Record_qryRecord",
+//			type: "GET",
+//			error: function(xhr) {
+//			//hideSendMsg();
+//			alert("讀取記錄失敗");
+//		    },
+//			data:cmdData,
+//		    beforeSend:function(){
+//		    	//showSendMsg("資料讀取中…");
+//			},
+//			success: function(response) {
+//				//hideSendMsg();
+//				
+//				
+//		    }
+//		});
+//	 
+//	 
+// }
+ 
+ //先送資料，再送計費，再顯示資料
+ function sendData(cmdData){//到web端要資料
+	    cmdData.auth=$("#auth_text").val();//加入檢查驗証碼
+	    var sendjson=JSON.stringify(cmdData);
+		$.ajax({
+			url: "./SendData.servlet",
+			type: "GET",
+			timeout: timeOut,//2017.08.15 Jason<1060815-1> 修改AP 60秒無回應相對處理
+//			error: function(xhr) {
+//			hideSendMsg();
+//			alert("查詢失敗");
+//		    },
+			error: function(XMLHttpRequest, textStatus, errorThrown){
+			    hideSendMsg();
+			    if(textStatus=="timeout"){//2017.08.15 Jason<1060815-1> 修改AP 60秒無回應相對處理
+			    	alert("連線逾時，請再次嘗試查詢");
+			    }else{
+			    	alert("查詢失敗");
+			    }
+			}, 
+			data:cmdData,
+		    beforeSend:function(){
+		    	showSendMsg("資料讀取中…");
+			},
+			success: function(response) {
+				//alert(response);
+				hideSendMsg();
+				
+				if(showAuthConfirm(response,cmdData))
+					return;
+				
+				if((response==undefined)||(response=="")){//沒回應資料路徑時
+				//alert("查無資料");
+					getResult(response,cmdData.W);
+				return;
+				}
+				
+				
+				if(response=="ERROR"){
+					alert("主機無回應，請稍後再試或聯絡客服人員");
+					//LogOut();
+					return;
+				}
+				
+				
+				
+				//alert(response);
+				var resut='X00';
+				if(response.search(';')!=-1){//代表資料有錯誤訊息要要處理
+					resut=response.split(";")[1];
+					response=response.split(";")[0];
+				}
+				
+				if(cmdData.is_message=="Y"){//判斷是否要計費
+				     message(cmdData.W,cmdData.ID,cmdData.USERID,cmdData.rec,cmdData.PROJECT,cmdData.Sheets,resut,response);
+				     //restTreeRecord(cmdData.W);//2018.05.08發現樹狀會亂排序，改由如果樹狀有增加再排序(疑似非同步問題導致樹狀結構記錄檔出問題，要移進message方法裡才可以)
+				}else{//不計費直接抓結果
+					 getResult(response,cmdData.W);
+				}
+			
+		    }
+		});
+}
+ 
+ 
+ var temp_cmdData;
+ function showAuthConfirm(response_text,cmdData){//檢查是否彈出驗証碼視窗,qry_type=> 1:計費 2:不計費 3:地圖 4:門牌
+	 
+	
+		if(response_text.search('AuthCode')!=-1){
+			  //temp_cmdData=cmdData;
+			  $("#auth_dialog").dialog( "open" );
+		      return true;
+		}
+		return false;
+	}
+ 
+
+ 
+ 
+ function message(w,id,userid,rec,sproject,Sheets,result_string,file_path){//計費
+	//alert(w+','+id+','+userid+','+rec+','+sproject+','+result_string);
+	 
+//		var check=chkCmdQryItem(w);//不計費項目判斷
+//		if(!check)
+//		return;	
+	
+		$.ajax({
+			url: "./Message.servlet",
+			type: "GET",
+			//async: false,
+			error: function(xhr) {
+			alert("計費失敗");
+		    },
+			//data:{W:w,ID:id,Size:'673',Rec:rec,County:result_string,class1:'1',PROJECT:sproject,PPC:'PPC'},
+			data:{W:w,ID:id,Size:'673',Rec:rec,County:result_string,class1:'1',PROJECT:sproject,Sheets:Sheets},
+		    beforeSend:function(){
+			},
+			success: function(response) {
+				var charge;
+				if(sys_type=='hinet'){
+					var fee=response;
+					charge=fee.split(";")[0];
+				}else{//關貿沒有顯示計費的功能要關掉,暫時給零
+					charge="0";
+				}
+					
+//				var fee=response;
+//				var charge=fee.split(";")[0];
+				if(charge!="")
+				$("#charge").text(charge);
+				if(result_string=="X00"){//有成功才記錄樹狀
+				record(w,file_path,$("#charge").text());//記錄過查詢的資料
+				}else{
+				getResult(file_path,w);
+				}
+				
+			
+		    }
+		});
+		
+}
+ 
+// function getResult(file_path,w){//取得結果
+//	   var result_type=chkResultType(w);
+//		$.ajax({
+//			url: "./result_getResult",
+//			type: "POST",
+//			error: function(xhr) {
+//			alert("取得資料失敗");
+//		    },
+//			data:{file_path:file_path,w:w},
+//		    beforeSend:function(){
+//				if(result_type!="PDF")
+//			    $(".content").empty();
+//				cleanMap();
+//			},
+//			success: function(response) {
+//				
+//				if(result_type=="PDF")
+//				{
+//					var url='./GetFile/'+response.text;
+//					//window.open(url,"","toolbar=no,location=no,directories=no,width=300,height=400");
+//					window.open(url,'_blank');
+//				}else{//一般HTML
+//				  $(".content").html(response);
+//				}
+//			
+//		    }
+//		});
+//}
+ 
+ 
+ function getResult(file_path,w){//取得結果
+		getTreeRecord(w);//新增用來更新樹狀選到的項目
+	 switchContent('2');
+	 var result_type=chkResultType(w);
+	 
+	 if(result_type=="PDF")
+	 {
+		 getPDFResult(file_path,w);
+	 }else if((result_type=="F")||(result_type=="I")){
+		 getMapResult(file_path,w);
+	 }else{
+		 getNormalResult(file_path,w);
+	 }
+ }
+ 
+ 
+ function getPDFResult(file_path,w){//取得PDF結果
+	 		$.ajax({
+			url: "./result_getResult",
+			type: "POST",
+			error: function(xhr) {
+			alert("取得資料失敗");
+		    },
+			data:{file_path:file_path,w:w},
+		    beforeSend:function(){
+				cleanMap();
+			},
+			success: function(response) {
+				    var url='./GetFile/'+response.text;
+					window.open(url,'_blank');		
+		    }
+		});
+}
+ 
+ function getMapResult(file_path,w){//取得結果
+		$.ajax({
+		url: "./result_getResult",
+		type: "POST",
+		dataType : "json",
+		error: function(xhr) {
+		alert("取得資料失敗");
+	    },
+		data:{file_path:file_path,w:w},
+	    beforeSend:function(){
+			cleanSectLayer();	
+		},
+		success: function(data) {
+			//alert(data);
+			
+			loadSectMap(data);
+			//record(w,file_path);
+	    }
+	});
+}
+ 
+ 
+ function getNormalResult(file_path,w){//取得一般結果
+		$.ajax({
+		url: "./result_getResult",
+		type: "POST",
+		error: function(xhr) {
+			hideSendMsg();
+		alert("取得資料失敗");
+	    },
+		data:{file_path:file_path,w:w},
+	    beforeSend:function(){
+			$(".content").empty();
+			cleanMap();
+			showSendMsg("取得資料中…");
+		},
+		success: function(response) {
+			hideSendMsg();
+			$(".content").html(response);
+	    }
+	});
+}
+
+ 
+ 
+ 
+		
+ function chkResultType(w){
+	 var result_type='html';//預設html
+	 var part=w.split(",")[5];
+	 var proj=w.split(",")[6];
+	 if((proj=='MB')&&(part=='1'))
+	 return 'PDF';	 
+//	 return result_type;
+	 return proj;
+ }
+ 
+ 
+ function record(w,file_path,charge){
+	 $.ajax({
+			url: "./Record_toRecord",
+			type: "POST",
+			dataType : "json",
+			error: function(xhr) {
+			alert("記錄查詢失敗");
+		    },
+			data:{w:w,file_path:file_path,now_charge:charge,qid:ensid},
+		    beforeSend:function(){
+			},
+			success: function(data) {
+				getResult(file_path,w);
+//				if(data.value=="update")
+//				getTreeRecord(w);
+				
+		    }
+		});
+ }
+ 
+ 
+ function getTreeRecord(w){
+	// alert('tt:'+w);
+	 if(w==undefined)
+		 w='';
+	 
+	 $.ajax({
+			url: "./Record_qryTree",
+			type: "POST",
+			error: function(xhr) {
+		 hideSendMsg();
+			alert("記錄查詢失敗");
+		    },
+			//data:{w:w,file_path:file_path},
+		    data:{w:w,qid:ensid},
+		    beforeSend:function(){
+				
+				//showSendMsgDiv('.detailItem','資料讀取中…');//影響視覺暫時取消
+			},
+			success: function(response) {
+				// hideSendMsgDiv('.detailItem');
+				$(".detailItem").html(response);
+				  $("#rec_list").parents('ul').show(); 
+				 // restTreeRecord(w);//2018.05.08發現樹狀會亂排序，改由如果樹狀有增加再排序
+				 
+		    }
+		});
+	 
+ }
+ 
+ function restTreeRecord(w){
+//	 var is_qry=temp_cmdData.is_qry;
+//	 if(is_qry=="Y")
+//	 return;
+	 
+	 $.ajax({
+			url: "./Record_restTree",
+			type: "POST",
+			error: function(xhr) {
+		     hideSendMsg();
+			 alert("更新記錄");
+		    },
+		    data:{w:w,qid:ensid},
+			success: function(response) {
+				
+		    }
+		});
+ }
+ 
+ function linkBuildQry(data){
+//	 alert(data);
+	 try{
+	 var proj=data.split("#")[0];
+	 var param=data.split("#")[1];
+	 var office=param.split(";")[0];
+	 var sectno=param.split(";")[1];
+	 var landbuild=parseBuildNoBrief(param.split(";")[2]+param.split(";")[3]) ;
+	 var city=office.substring(0,1);
+	 var code='';
+	 var regid='';
+	 if(param.split(";").length==5)
+		 regid=param.split(";")[4];
+	 toLinkQry(proj,city,office,sectno,landbuild,code,regid);
+	 }catch(e){
+		 alert('發生錯誤');
+	 }
+ }
+ 
+ function linkLandQry(data){
+//	 alert(data);
+	 try{
+	 var proj=data.split("#")[0];
+	 var param=data.split("#")[1];
+	 var office=param.split(";")[0];
+	 var sectno=param.split(";")[1];
+	 var landbuild=parseLandNoBrief(param.split(";")[2]+param.split(";")[3]) ;
+	 var city=office.substring(0,1);
+	 var code='';
+	 var regid='';
+	 if(param.split(";").length==5)
+		 regid=param.split(";")[4];
+	 toLinkQry(proj,city,office,sectno,landbuild,code,regid);
+	 }catch(e){
+		 alert('發生錯誤');
+	 }
+ }
+ 
+ 
+ function toLinkQry(proj,city,office,sectno,landbuild,code,regid){
+	 var send_param = new Object();
+	 send_param.city=city;
+	 send_param.office=office;
+	 send_param.sectno=sectno;
+	 send_param.landbuild=landbuild;
+	 send_param.project=proj;
+	 send_param.code=code;
+	 send_param.regid=regid;
+	 toGetCmd(send_param);	
+	 send_param=null;
+ }
+ 
+ 
+ function checkAuth(auth_code,enqid){
+		//alert(auth_code+','+enuid);
+		if(auth_code==""){
+			alert('請輸入驗証碼');
+			return;
+		}
+		
+		if(auth_code.length!=4){
+			alert('請輸入四位數字驗証碼');
+			return;
+		}
+		
+//		
+//		if(isNaN(auth_code)){
+//			
+//			alert('請輸入數字');
+//			return;
+//		}
+		
+		
+		
+		$.ajax({
+			url: "./Auth_checkAuthCode",
+			async: false,
+			type: "POST",
+			dataType : "json",
+			error: function(xhr) {
+			alert("驗証失敗");
+		    },
+			data:{auth_code:auth_code,enQID:enqid},
+		    beforeSend:function(){
+				showSendMsg("查詢中...");
+			},
+			success: function(data) {
+				hideSendMsg();
+				 
+				 if(data.value=="AuthErro"){ 
+					    
+					 LogOut();
+				     alert("輸入驗証碼錯誤次數超出系統限制，已登出系統");
+					
+				 }else if(data.value=="ok"){ 
+					 $("#auth_dialog").dialog( "close" );
+					 
+					 sendData(temp_cmdData);
+				 }else{
+					 chAuthImage(enqid);
+					 alert("驗証碼錯誤");
+				
+				 }
+				 
+				
+		    }
+		});
+			
+	}
+
+ 
+		 

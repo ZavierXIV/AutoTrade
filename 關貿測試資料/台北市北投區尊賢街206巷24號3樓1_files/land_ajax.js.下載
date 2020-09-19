@@ -1,0 +1,819 @@
+﻿function landQuery(){
+	
+	var qry_type=$("input[name='RadioGroup1']:checked").val();
+	var sn_type=$("input[name='RadioGroup3']:checked").val();
+	var city=$(".country").find('option:selected').val();
+	var town=$(".township").find('option:selected').val();
+	var sect=$(".section").find('option:selected').val();
+	var sectno=$('.sectioncode').val();//段號
+	var number=$('.number').val();//地號
+	var code=$('#onwer_code').val();//權利人統一編號
+	var project=$("#project"+qry_type).find('option:selected').val();//查詢項目
+	var data = new Object();
+	if(city==""){
+		alert("請選擇縣市");
+		return;
+	}
+	
+	if(town==""){
+		alert("請選擇鄉鎮");
+		return;
+	}
+	
+	if(sect==""){
+		alert("請選擇地段");
+		return;
+	}
+	
+	if(sectno=="輸入數值"){
+		alert("請輸入段代碼");
+		return;
+	}
+	
+	if(project==""){
+		alert("請選擇查詢項目");
+		return;
+	}
+	
+	if(number==""){
+		if(qry_type=='L')
+		alert("請輸入地號");
+		if(qry_type=='B')
+		alert("請輸入建號");
+		return;
+	}
+	
+	
+	
+	
+	if($("#cltype_div").is(':visible'))//當1二類畫面有出現時才去設定值，不然預設都是二類查詢
+	{
+		var cl=$("input[name='RadioGroup2']:checked").val();
+		if((cl=='1')&&(code==""))
+		{
+				alert("選擇一類時需輸入統編");
+				return;
+		}
+		data.menu_cl=cl;
+		data.cl=cl;
+	}else{
+		data.cl='2';
+	}
+	
+	
+	//2018.04.16修改判斷統編輸入
+	
+//	if($("#owner_div").is(':visible')){
+//		var sn_type=$("input[name='RadioGroup3']:checked").val();
+//		if(sn_type=="regid"){
+//			
+//			return;
+//		}
+//	}
+	
+	//2018.04.16修改判斷統編輸入
+	
+	
+	
+	data.city=city;
+	data.town=town;
+	data.sectno=sectno;
+	data.landbuild=number;
+	data.project=project;
+	data.code=code;
+	data.sn_type=sn_type;
+	menu_click_tree=true;
+	toGetCmd(data);		
+
+}
+
+
+function treeQuery(city,town,sectno,number,project,code,regid){//樹狀結構反查
+	//if(menu_click_tree){//從選單展開樹狀別送查詢
+		//menu_click_tree=false;
+		//return;
+	//}
+	var data = new Object();
+	data.city=city;
+	data.town=town;
+	data.sectno=sectno;
+	data.landbuild=number;
+	data.project=project;
+	data.code=code;
+	data.regid=regid;
+	data.menu_cl=undefined;//一律以二類查詢
+	toGetCmd(data);	
+	data=null;
+}
+
+
+function ownerMenuQuery(city,town,sectno,number,project,code,regid,menu_cl){//所有權人快速定位反查
+	var data = new Object();
+	data.city=city;
+	data.town=town;
+	data.sectno=sectno;
+	data.landbuild=number;
+	data.project=project;
+	data.code=code;
+	
+	if($("#owner_div").is(':visible')){
+		var sn_type=$("input[name='RadioGroup3']:checked").val();
+		if(sn_type=="regid"){
+//			if(project=="A2")//建物析有檔快速角定位特例
+//				data.project="B";
+		data.code=$("#onwer_code").val();
+		}
+	}
+	
+	//2017.01.23修改
+	if(project=="A2")//建物析有檔快速角定位特例
+		data.project="B";
+	//2017.01.23修改
+	
+	data.regid=regid;
+	if(menu_cl!=undefined){
+	data.menu_cl=menu_cl;
+	data.cl=menu_cl;
+	}	
+	var sn_type=$("input[name='RadioGroup3']:checked").val();//從選單取得資料
+	data.sn_type=sn_type;
+	toGetCmd(data);	
+	data=null;
+}
+
+
+
+function getPdfDxf(DLData){
+//	alert('proj:'+DLData.proj+",wid:"+DLData.wid+",city:"+DLData.city+",sectno:"+DLData.sectno+",mno:"+DLData.mno+",cno:"+DLData.cno);
+$.ajax({
+	url: "./downPdfDxf.action",
+	type: "POST",
+	dataType: "json",
+	error: function(xhr) {
+	hideSendMsg();
+	alert( "下載失敗");
+    },
+	data:{county:DLData.city,sectno:DLData.sectno,mno:DLData.mno,cno:DLData.cno,project:DLData.proj,waterid:+DLData.wid},
+    beforeSend:function(){
+		showSendMsg('下載中…');
+	},
+	success: function(data) {
+		hideSendMsg();
+		var path=data.text;
+        if(path.search('POOL')!=-1){
+                         window.location=path;
+         }else{
+                         alert(path);  
+        }
+		
+    }
+});
+//DLData=null;
+
+}
+
+
+//function exportPDF(){
+//	toZoomExtend(map,map_source);
+//	map.once('postcompose', function(event) {
+//
+//	     
+//	   
+//	      var newScale=$("input[name='scale_type']:checked").val();
+//	      var center = map.getView().getCenter();
+//	      center=ol.proj.transform(center, 'EPSG:3857', 'EPSG:4326');
+//	      var orginScale=getMapScale();
+//	      if(newScale=='custom')
+//	    	  newScale=$("#custom_text").val(); 
+//	      
+//	  
+//	     
+//	     
+//	      
+//	     var get_extend= transform( map.getView().calculateExtent(map.getSize()));//取得左下右上範圍(經緯度)
+//	     
+//	    
+//	     //先飛行
+//	     var fly_scale=orginScale-300;
+//	     viewToScale(fly_scale);
+//	     
+//	  
+//	     
+//	     	      
+//	      //var to_view= map.getView();
+//	     
+////	     view.on("change:resolution",function(e){
+//	    	 
+//	      var to_move=map.on('moveend', function(e) { 
+//	    			  map.unByKey(to_move); 
+//	    			//飛行後再取圖
+//	    		     var canvas = event.context.canvas;
+//	    		     var image= canvas.toDataURL('image/png');
+//
+//	    	
+//	    	
+//	    	 // map.unByKey('moveend');  
+//	    	  //送出產pdf的地方
+//	    	  var data = new Object();
+//	    	  data.base64Str=image;
+//	    	  data.orginScale=orginScale;
+//	    	  data.newScale=newScale;
+//	    	  data.ldx=get_extend[0];
+//	    	  data.ldy=get_extend[1];
+//	    	  data.rux=get_extend[2];
+//	    	  data.ruy=get_extend[3];
+//	    	  data.cx=center[0];
+//	    	  data.cy=center[1];
+//	    	  toExportPDF(data);
+//	    	  //送出產pdf的地方
+//	      }); 
+//	      //view.setResolution(resolution);  
+//	});
+//    map.renderSync();
+//
+//
+//}
+
+
+function printByPDFIMG(type){//把前端存成圖片丟到後端去做圖的處理
+	  //showSendMsg('讀取中…');
+	  var orginScale = $("input[name='scale_type']:checked").val();
+	  
+	  if (orginScale == "custom" )
+		  orginScale =$("#custom_text").val(); 	
+	  
+	
+	  var print_sect=AllSect_vector==undefined?'':'Y';
+	  
+	// alert('orginScale:'+orginScale);
+	    var landno=parseLandNo8(DLData.mno+'-'+DLData.cno);
+		$.ajax({
+			url: "./result_getResult",
+			type: "POST",
+			dataType : "json",
+			error: function(xhr) {
+			alert("取得資料失敗");
+			hideSendMsg();
+		    },
+			data:{city:DLData.city,town:DLData.town,sectno:DLData.sectno,landno:landno,scale:orginScale,file_path:DLData.file_name,type:type,proj:DLData.proj,print_sect:print_sect},
+		    beforeSend:function(){
+				showSendMsg('讀取中…');
+			},
+			success: function(data) {
+			
+				
+				if(type=='IMD'){
+				  toPrintImg(data.file_url);
+				}else{	
+					var url="./GetFile"+data.file_url;
+				  toPrintPDF(url);
+				}
+				hideSendMsg();
+		    }
+		});
+
+	  		
+	 
+}
+
+function toPrintImg(img_url)
+{
+	
+	
+	//dialog列印
+//     $("#print_land_img").attr("src",img_url);
+//	 $( "#print_land_img" ).load(function() {
+//		 $("#dialog_image_div").print({   globalStyles : false,title: html_title, prepend : ""});
+//		 $( "#dialog-image" ).dialog( "close" );
+//		 $( "#dialog_image_div" ).empty();	 
+//	 });
+	//dialog列印
+	 
+
+	var win1 = window.open('');
+	win1.document.write('');
+	win1.document.write('<style>@page {size: A4;margin: 0;}@media print {html, body,img {width: 210mm;height: 297mm;}</style>');
+    win1.document.write('<img id="print_land_img" src="' + img_url + '" height="100%" width="100%"  />'); 
+    printImgcallback(win1);
+
+	
+
+}
+
+function toPrintPDF(pdf_url)
+{
+
+
+	     $('#printFrame').empty();
+	
+	     $('#printFrame').attr('src', pdf_url);
+	     
+	     var ifr=document.getElementById('printFrame');
+	     ifr.onload=function(){
+	    		
+	    	 var frame = document.getElementById('printFrame');
+//		        if (!frame) {
+//		            alert("Error: Can't find printing frame.");
+//		            return;
+//		        }
+	    		showSendMsg('列印處理中…');
+	    	  setTimeout(function() {  
+	    		  hideSendMsg();
+		        $('#printFrame').show();
+	            	frame = frame.contentWindow;
+	     	        frame.focus();
+	     	        frame.print();
+	     	       frame.close();
+	     	       $('#printFrame').hide();
+	     	       
+	    		}
+		  		,1000);
+	     };	
+	
+}
+
+function toPrintHtml(html_url)
+{
+	
+	
+
+	
+
+	$.ajax({
+		type: "GET",
+		url: html_url,
+		  dataType: "html",
+		beforeSend:function(){
+//		$( "#dialog-image" ).dialog('open');
+		},
+		error: function(xhr) {
+	     alert('載入資料失敗');
+	     $( "#dialog-image" ).dialog( "close" );
+	    },
+		success: function(response) {
+	    	
+			$("#dialog_image_div").html(response);
+			
+//			$( "#dialog_image_div" ).load(function() {
+			     var title_info= $(".print_head").html()==undefined?'':$(".print_head").html();
+				 $("#dialog_image_div").print({  mediaPrintm:true, globalStyles : false,title: html_title, prepend : title_info});
+//				 $( "#dialog-image" ).dialog( "close" );
+				 $( "#dialog_image_div" ).empty();	 
+//			 });
+			
+		}
+	});
+}
+
+
+function toPrintImage(data){
+	 //var win = window.open('');
+	// win.document.write('<style>@page {size: auto;margin: 10mm;}</style>');
+	 //win.document.write('<img id="print_land_img" src="' + data.img_url + '" height="'+data.height+'px" width="'+data.width+'px"  />'); 
+	 //win.document.write('<script>function printImgcallback2() { window.print();window.close();}</script>');
+	
+	 
+	 //window.print('<img id="print_land_img" src="' + data.img_url + '" height="'+data.height+'px" width="'+data.width+'px"  />');
+	 
+	 //原碼
+	 var win = window.open('');
+
+	 var version=$.browser.version;
+	 
+	 if($.browser.chrome){
+	     win.document.write('<style>@page {size: A4;margin: 0;}@media print {html, body {width: 210mm;height: 297mm;}</style>');
+	 }else{
+		 win.document.write('<style>@page {size: A4;margin: 0;}@media print {html, body,img {width: 210mm;height: 297mm;}</style>');
+	 }
+	   //win.document.write('<img id="print_land_img" src="' + data.img_url + '"/>'); 
+	   
+	   //win.document.write('<img id="print_land_img" src="' + data.img_url + '"  height="99%" width="99%"  />');		
+	   
+	   win.document.write('<img id="print_land_img" src="' + data.img_url + '" height="'+data.height+'px" width="'+data.width+'px"  />'); 
+	     if($.browser.msie){
+	          setTimeout(function() {     printImgcallback(win);},500);
+		   }else{
+			 
+	     win.document.getElementById("print_land_img").onload = function() {
+		         
+				 printImgcallback(win);
+				
+			};
+		 }
+	 //原碼
+	  
+	  
+}
+
+function toExportImage(data){
+	$.ajax({
+		url: "./Export_Image.action",
+		type: "POST",
+		dataType: "json",
+		error: function(xhr) {
+		hideSendMsg();
+		alert( "下載失敗");
+	    },
+		data:{base64Str:data.base64Str,orginScale:data.orginScale,newScale:data.newScale,ldx:data.ldx,ldy:data.ldy,rux:data.rux,ruy:data.ruy,cx:data.cx,cy:data.cy},
+	    beforeSend:function(){
+			//showSendMsg('讀取中…');
+		},
+		success: function(data) {
+			 hideSendMsg();
+			 if(data.value=="ok"){
+			 var win1 = window.open('');
+			  //win.document.write('<img id="print_build_img" src="' + image_url + '"  height="842" width="595"  />');
+			 win1.document.write('<style>@page {size: auto;margin: 0mm;}</style>');
+			  var version=$.browser.version;
+			  if($.browser.msie){
+				  win1.document.write('<img id="print_land_img" src="' + data.text + '" height="100%" width="100%"  />'); 
+			  }else if($.browser.chrome){
+				  win1.document.write('<img id="print_land_img" src="' + data.text + '"/>');
+			  }else{	
+				  win1.document.write('<img id="print_land_img" src="' + data.text + '"  height="99%" width="99%"  />');		 
+			  }
+			  
+			
+			  
+				   if($.browser.msie){
+			          setTimeout(function() {     printImgcallback(win1);},500);
+				   }else{
+					 
+			  win1.document.getElementById("print_land_img").onload = function() {
+				         
+						 printImgcallback(win1);
+						
+					};
+				 }
+			  
+			 }else{
+				 alert(data.text);
+			 }
+
+	    }
+	});
+}
+
+
+function exportPDF(){
+//	toZoomExtend(map,map_source);
+	
+		
+		//console.log("測試:"+ getMapScale().toFixed(0));
+		var get_extend1= transform( map.getView().calculateExtent(map.getSize()));
+		   var scale = "";
+		   var mapScale = "" ;
+		   
+		   
+     scale = $("input[name='scale_type']:checked").val();
+		     
+		  	if (scale == "origin" ){
+		  		scale = getMapScale().toFixed(0);
+		  	}else if (scale =="custom"){
+		  		 scale =$("#custom_text").val(); 
+		  		 //viewToScale(parseInt(scale,10));
+		  		 
+		  	}else{
+		  		//viewToScale(parseInt(scale,10));
+		  		// view.setResolution(parseInt(scale,10));
+		  		
+		  	}
+		  	
+		  	
+//		  	alert(scale);
+//		    alert( 	DLData.file_name);
+		 
+//		   var w='*,*,*,*,*,'+scale+',SCOPE';
+//		   $.ajax({
+//				url: "./result_getResult",
+//				type: "POST",
+//				dataType : "json",
+//				error: function(xhr) {
+//				 hideSendMsg();
+//				 alert("取得資料失敗");
+//			    },
+//				data:{file_path:DLData.file_name,w:w},
+//			    beforeSend:function(){
+//					showSendMsg('資料讀取中…');
+//				},
+//				success: function(data) {
+//					 hideSendMsg();
+//					
+//					 
+//					 var textent =ol.proj.transformExtent([data.minX, data.minY, data.maxX, data.minY], 'EPSG:4326', 'EPSG:3857');
+//						map.getView().fit(textent, map.getSize());
+//					
+//			    }
+//			});
+		  	
+		 
+		  	
+			viewToScale(parseInt(scale,10));
+	     
+	     	 
+			  	 
+		  	 
+		  	setTimeout(
+		  			function(){
+		  				 map.once('postcompose', function(event) {
+		  				 mapScale =  getMapScale().toFixed(0);
+		  				 sendMakePDFD(event,scale,mapScale);
+		  				 
+		  				});
+		  				  map.renderSync();
+		  			}
+		  		,3000);
+     
+     
+		  	
+  
+
+
+}
+	      
+	      
+	      
+	      function sendMakePDFD(event,scale,mapScale){
+	    		 
+	    	  console.log('scale2:'+scale+',mapScale2:'+mapScale);
+	    			//飛行後再取圖
+	    		 var canvas = event.context.canvas;
+	    		 var img= canvas.toDataURL('image/png');
+	    		 var blobBin = atob(img.split(',')[1]);
+	    		    var array = [];
+	    		    for(var i = 0; i < blobBin.length; i++) {
+	    		        array.push(blobBin.charCodeAt(i));
+	    		    }
+	    		    var file=new Blob([new Uint8Array(array)], {type: 'image/png'});
+	    		    
+	    		    alert("file:"+file);
+	    		 
+//	    		 var image= canvas.toDataURL('image/png');
+//	    		     
+//	    		var center = map.getView().getCenter();
+//	   		    center=ol.proj.transform(center, 'EPSG:3857', 'EPSG:4326');
+//	   	   
+//
+//	    	   var get_extend= transform( map.getView().calculateExtent(map.getSize()));
+//	    		     
+//	    		     
+//	    		    
+//	   
+//	    	  //送出產pdf的地方
+//	    	  var data = new Object();
+//	    	  data.base64Str=image;
+//	    	  data.orginScale=mapScale;
+//	    	  data.newScale=scale;
+//	    	  data.ldx=get_extend[0];
+//	    	  data.ldy=get_extend[1];
+//	    	  data.rux=get_extend[2];
+//	    	  data.ruy=get_extend[3];
+//	    	  data.cx=center[0];
+//	    	  data.cy=center[1];
+//	    	  toExportPDF(data);
+	      }
+
+function toExportPDF(data){
+	$.ajax({
+		url: "./Export_PDF.action",
+		type: "POST",
+		dataType: "json",
+		error: function(xhr) {
+		hideSendMsg();
+		alert( "下載失敗");
+	    },
+		data:{base64Str:data.base64Str,orginScale:data.orginScale,newScale:data.newScale,ldx:data.ldx,ldy:data.ldy,rux:data.rux,ruy:data.ruy,cx:data.cx,cy:data.cy},
+	    beforeSend:function(){
+			showSendMsg('下載中…');
+		},
+		success: function(data) {
+			 hideSendMsg();
+			 
+			 if(data.value=="ok"){
+			 var url='./GetFile/'+data.text;
+			 $.fileDownload(url)
+			    .done(function () {})
+			    .fail(function () {});
+			 }else{
+				 alert(data.text);
+			 }
+	    }
+	});
+
+}
+
+
+function saveMapImage(){
+	
+	 map.once('postcompose', function(event) {
+	      var canvas = event.context.canvas;
+	      var image = canvas.toDataURL('image/png');
+	      pngToJPEG(image);
+	 });
+	 map.renderSync();
+}
+
+
+
+function pngToJPEG(base64Str){
+	$.ajax({
+		url: "./Export_JPEG.action",
+		type: "POST",
+		dataType: "json",
+		error: function(xhr) {
+		hideSendMsg();
+		alert( "下載失敗");
+	    },
+		data:{base64Str:base64Str},
+	    beforeSend:function(){
+			showSendMsg('下載中…');
+		},
+		success: function(data) {
+			 hideSendMsg();
+			 
+			 
+			 if(data.value=="ok"){
+			 var url='./GetFile'+data.text;
+			 $.fileDownload(url)
+			    .done(function () {})
+			    .fail(function () {});
+			 }else{
+				 alert(data.text);
+			 }
+	    }
+	});
+
+}
+
+
+function openInterfacing(DLData,type){//開啟樂活網連結處理
+
+	var w='*,*,'+DLData.city+','+DLData.sectno+',*,*,'+type;
+	
+	
+	$.ajax({
+		url: "./result_getResult",
+		type: "POST",
+		dataType : "json",
+		error: function(xhr) {
+		 hideSendMsg();
+		 alert("取得資料失敗");
+	    },
+		data:{file_path:DLData.file_name,w:w},
+	    beforeSend:function(){
+			showSendMsg('資料讀取中…');
+		},
+		success: function(data) {
+			 hideSendMsg();
+			 if(data.value=="ok"){
+				 window.open(data.text,'_blank');
+			 }else{
+				 
+				 alert(data.text);
+			 }
+					 
+			
+	    }
+	});
+		
+		
+		
+}
+
+
+
+function upLoadKmlShp(formid){
+
+	var filename = $("[name='exdvec']").val();
+	if (typeof (filename) == undefined || filename == "") {
+		alert('請選取欲載入檔案');
+		return;
+	}
+	if (!filename.endsWith(".zip")){
+		alert("請將檔案壓縮zip檔後，再點選載入");
+		return;
+	}
+	//submitCmForm(formid,"./UpLoad_vecFile","檔案上傳...");
+	
+	
+	var formData = new FormData(document.getElementById(formid));
+    $.ajax({
+    url: 'UpLoad_vecFile',
+    type: 'POST',
+    data:  formData,
+    mimeType:"multipart/form-data",
+    contentType: false,
+    cache: false,
+    processData:false,
+    dataType : "json",
+    beforeSend:function(){
+    	showSendMsg('上傳中…');
+    },
+    error: function(jqXHR, textStatus, errorThrown) 
+    {
+    	hideSendMsg();
+   	    alert('上傳失敗');
+    },     
+    success: function(data, textStatus, jqXHR)
+    {
+    	//alert(JSON.stringify(data));
+   	    hideSendMsg();
+   	
+   	    if(data.value=='ok')
+   	    {
+   	    	
+   	 	if(extend_kml!=undefined)
+      		map.removeLayer(extend_kml);	
+   	    	
+      	extend_kml = new ol.layer.Vector({
+   	    source: new ol.source.Vector({
+   	      url: data.text,
+   	      format: new ol.format.KML()
+   	    })
+   	    });
+      	
+      
+      	
+      	 map.addLayer(extend_kml);
+      	
+    	 var listenerKey = extend_kml.on('change', function () {
+    		    var source = extend_kml.getSource(); 
+                toZoomExtend(map,source);
+                extend_kml.unByKey(listenerKey);
+                $( "#dialog-upload" ).dialog('close');
+         });
+    	 
+   	    }else{
+   	    	alert(data.text);
+   	    }
+
+    	
+         }     
+    });
+	
+}
+
+
+function clearKml(){
+	map.removeLayer(extend_kml);
+	//extend_kml.getSource().clear();
+}
+
+function linkEDOC(qid,city,town,sectno,landno,enuid){
+//	alert('city:'+city);
+//	alert('town:'+town);
+//	alert('sectno:'+sectno);
+//	alert('landno:'+landno);
+	
+     try{
+     if((city=='')||(town=='')||(sectno=='')||(landno=='')){
+    	 alert('資料缺少');
+    	 return;
+     }
+
+     var smno=landno.substring(0,4);
+     var scno=landno.substring(4);
+     var mno=parseInt(smno,10);
+     var cno=parseInt(scno,10);
+	 var DLData = new Object();
+	 DLData.city=city;
+	 DLData.town=town;
+	 DLData.sectno=sectno;
+	 DLData.mno=mno;
+	 DLData.cno=cno;
+	 DLData.qid=qid;
+	 DLData.enuid=enuid;
+	 sendEdoc(DLData);
+	 
+     }catch(e){
+    	 //alert(e);
+     }
+}
+
+
+function sendEdoc(DLData){
+	
+	$.ajax({
+		url: "./Qry_qryEDOC.action",
+		type: "POST",
+		dataType: "json",
+		error: function(xhr) {
+		hideSendMsg();
+		alert( "查無資料");
+	    },
+		data:{qid:DLData.qid,city:DLData.city,town:DLData.town,sectno:DLData.sectno,mno:DLData.mno,cno:DLData.cno,uid:DLData.enuid},
+	    beforeSend:function(){
+			showSendMsg('查詢中…');
+		},
+		success: function(data) {
+			hideSendMsg();
+			window.open(data.text,'_blank');
+		}
+	});
+}
+
+
+
+
+
+

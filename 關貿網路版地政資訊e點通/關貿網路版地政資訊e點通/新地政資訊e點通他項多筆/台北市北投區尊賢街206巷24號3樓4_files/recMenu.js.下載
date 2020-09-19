@@ -1,0 +1,109 @@
+var rec_proj_r='L';
+var rec_proj;//地建號查詢
+var rec_proj2;//記錄異重索引
+var rec_landno;
+var rec_type;
+var rec_owner_type;
+var rec_owner;
+var rec_owner_code;
+var rec_apply_code;
+var rec_code;
+var rec_qry_cl;//要送到後端組命令的查詢類別
+function readlandEnter(){
+	//alert('****測試:'+rec_proj);
+	 selectCLType();
+     //原方法，升級成jquery 3.0帶如值如果沒有值下拉選單會空白 
+	//$('#projectL').val(rec_proj);
+	//$('#projectB').val(rec_proj);
+	 setSelectVal('#projectL',rec_proj);
+	 setSelectVal('#projectB',rec_proj);
+	if(rec_proj_r=='L'){
+		$("#RLAND").click();
+	}else{
+		$("#RBUILD").click();
+	}
+	
+	if(rec_owner_type=='onwer'){
+		$("#onwer").click();
+		
+	}else{
+		$("#regid").click();
+	}
+
+	$('#number').val(rec_landno);
+	$('#onwer_code').val(rec_owner_code);
+	$('#code').val(rec_code);
+	ch_proj(rec_proj);
+	//alert('rec_qry_cl:'+rec_qry_cl+',ownerno_deful:'+ownerno_deful);
+	if(rec_qry_cl=='1'){
+	$('#onwer_code').val(ownerno_deful);
+	rec_owner_code=ownerno_deful;
+	}
+}
+
+function readIndexEnter(){
+	
+    selectCLType();
+  //原方法，升級成jquery 3.0帶如值如果沒有值下拉選單會空白
+//	$('#projectL').val(rec_proj2);
+//	$('#projectB').val(rec_proj2);
+    setSelectVal('#projectL',rec_proj2);
+	 setSelectVal('#projectB',rec_proj2);
+	if(rec_proj_r=='L'){
+		$("#RLAND").click();
+	}else{
+		$("#RBUILD").click();
+	}
+	if(rec_owner_type=='onwer'){
+		$("#onwer").click();
+		
+	}else{
+		$("#regid").click();
+	}
+
+	$('#number').val(rec_landno);
+	$('#onwer_code').val(rec_owner_code);
+	$('#apply_code').val(rec_apply_code);
+	ch_proj(rec_proj2);
+	if(rec_qry_cl=='1'){
+		
+		$('#onwer_code').val(ownerno_deful);
+		rec_owner_code=ownerno_deful;
+	}
+}
+
+
+function selectCLType(){
+
+	if(qry_cl!='1'){//不等於一類時
+		$("#RadioGroup2_0").attr('disabled', true);
+	}else{//等於一類時
+		//$("#onwer_code").val(ownerno_deful);
+		//rec_owner_code=ownerno_deful;
+		if(ownerno_edit=="false")
+			$("#onwer_code").attr('disabled', true);
+			
+		$("#regid").attr('disabled', true);
+	}
+	
+	if(rec_qry_cl=='1'){
+		//$("#RadioGroup2_0").click();
+		$("#RadioGroup2_1").click();////Jason 2017.10.01<1061031-1> 本來有插自然人憑証卡預設選一類，改成預設都選二類
+	}else{
+		$("#RadioGroup2_1").click();
+	}
+}
+
+
+function readDoorEnter(){
+	//alert(s_road);
+//	$('#road').val(s_road);
+	
+	//$('#keyin').val(s_road);
+	
+	if((s_road=='')||(s_road==null))
+		return;
+	
+	$('#keyin').val($('#road').find('option:selected').text());
+
+}

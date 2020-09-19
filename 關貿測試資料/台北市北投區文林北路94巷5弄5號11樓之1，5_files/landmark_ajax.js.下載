@@ -1,0 +1,130 @@
+var mark_x;//地棟x坐標(TWD97)
+var mark_y;//地標y坐標(TWD97)
+function selectType(){
+	
+//	mark_x='';
+//	mark_y='';
+	
+    var city=$('.country').find('option:selected').val();
+	var type=$('input[name=search_type]:checked').val();
+	if(type=='select')
+	{
+		$('#search_text').val('');
+		$('.markClass').attr( "disabled", false );
+		$('.markType').attr( "disabled", false );
+		$('.landmark').attr( "disabled", false );
+		$('#search_text').attr( "disabled", true );
+		//$('#search_btn').attr( "disabled", true );
+	}else{
+		$('.markClass').val('');
+		$('.markType').val('');
+		$('.landmark').val('');
+		$('.markClass').attr( "disabled", true );
+		$('.markType').attr( "disabled", true );
+		$('.landmark').attr( "disabled", true );
+		if(city==''){
+			alert('請選擇縣市');
+			return;
+		}
+		$('#search_text').attr( "disabled", false );
+		//$('#search_btn').attr( "disabled", false );
+	}
+	
+}
+
+
+function setType(){
+	 var city=$('.country').find('option:selected').val();
+	if(city==''){
+		return;
+	}
+	var type=$('input[name=search_type]:checked').val();
+	if(type!='select')
+	{
+		$('#search_text').attr( "disabled", false );
+	}else{
+		$('.markClass').attr( "disabled", false );
+		$('.markType').attr( "disabled", false );
+		$('.landmark').attr( "disabled", false );
+	}
+}
+
+function getMarkType(classname){
+	  var data={class_name:classname};
+	  fromAjaxLoad('./LandMark_getTypeList','地標種類',data,'.markType');
+}
+
+function getMarkList(country,ptype){
+	  var city=$(country).find('option:selected').val();
+	  if(city==''){
+			alert('請選擇縣市');
+			return;
+	  }
+	  var data={city_code:city,ptype:ptype};
+	  fromAjaxLoad('./LandMark_getMarkList','選擇地標',data,'.landmark');
+}
+
+function getMarkPoint(city_div,ptype_div,landmark){
+	var city=$(city_div).find('option:selected').val();
+	var ptype=$(ptype_div).find('option:selected').val();
+	$.ajax({
+		type: "POST",
+		url: './LandMark_getMarkPoint',
+		dataType : "json",
+		data:{city_code:city,ptype:ptype,land_mark:landmark},
+		error: function(xhr) {
+			alert("定位失敗");
+			hideSendMsg();
+	    },
+	    beforeSend:function(){
+	    	showSendMsg("定位中…");
+		},
+		success: function(data) {
+			hideSendMsg();
+			mark_x=data.tw97_x;
+			mark_y=data.tw97_y;
+		}
+	});
+}
+
+
+
+function landMarkQry(city_div,type_div,smark_div,emark_div){//地標查詢
+	var project='K';
+	var city=$(city_div).find('option:selected').val();
+	var landmark;
+	var type=$('input[name='+type_div+']:checked').val();
+	
+	if(city==""){
+		alert("請選擇縣市");
+		return;
+	}
+	
+	if(type=='select')
+	{
+		
+		if($(smark_div).find('option:selected').val()==""){
+			alert("請由下拉選單選擇查詢的地標");
+			return;
+		}
+		
+		landmark=$(smark_div).find('option:selected').val();
+	}else{
+		
+		if($(emark_div).val()==""){
+			alert("請輸入查詢的地標");
+			return;
+		}
+		landmark=$(emark_div).val();
+	}
+	//alert('mark_x:'+mark_x+',mark_y:'+mark_y+',landmark:'+landmark);
+	
+	
+	var data = new Object();
+	data.project=project;
+	data.WGS84_x=mark_x;
+	data.WGS84_y=mark_y;
+	toGetCmd(data);	
+	data=null;	
+	
+}

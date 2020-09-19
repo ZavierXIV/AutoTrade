@@ -1,0 +1,270 @@
+//2013.05.24Jason<20130524-1>修改行動版電傳系統比照現有PC查新增經緯度查詢功能
+function selectDegree(){
+	var select=$('input[name=lonlat]:checked').val();
+	
+	 
+	if(select=="degree")
+	{ 
+		var lat_du=$("#deg_lat_du").val();	
+		var lat_min=$("#deg_lat_min").val();	
+		var lat_sec=$("#deg_lat_sec").val();
+		var lon_du=$("#deg_lon_du").val();	
+		var lon_min=$("#deg_lon_min").val();	
+		var lon_sec=$("#deg_lon_sec").val();
+		var lat=degToDec(lat_du,lat_min,lat_sec);
+		var lon=degToDec(lon_du,lon_min,lon_sec);
+		$("#degree_lat").val(lat);	
+		$("#degree_lon").val(lon);	
+		$("#degree_enter").show();
+		$("#degree_enter2").hide();
+	}else{
+		var lat=$("#degree_lat").val();	
+		var lon=$("#degree_lon").val();	
+		var declat=decToDeg(lat);
+		var declon=decToDeg(lon);
+	    $("#deg_lat_du").val(declat.split('-')[0]);
+	    $("#deg_lat_min").val(declat.split('-')[1]);
+	    $("#deg_lat_sec").val(declat.split('-')[2]);
+	    $("#deg_lon_du").val(declon.split('-')[0]);
+	    $("#deg_lon_min").val(declon.split('-')[1]);
+	    $("#deg_lon_sec").val(declon.split('-')[2]);
+		$("#degree_enter2").show();
+		$("#degree_enter").hide();
+	}
+	//alert("選中的值"+select);
+}
+//十進制轉度分秒 
+
+
+ function decToDeg(pos,dot_limit) { 
+	           if(pos=="")
+	           return ""+ '-' +""+ '-' +"";
+               var absPos = Math.abs(pos); 
+               var deg = Math.floor(absPos); 
+               var min = Math.floor((absPos - deg) * 60); 
+              // var sec = (((absPos - deg) * 60 - min) * 60).toFixed(2); 
+               var sec = (((absPos - deg) * 60 - min) * 60); 
+               if(dot_limit!=undefined)
+            	   sec=sec.toFixed(dot_limit);
+               return deg + '-' + min + '-' + sec ;
+ } 
+
+
+ //度分秒轉十進制 
+
+function degToDec(du,min,sec) { 
+	
+   if((du=="")||(min=="")||(sec==""))
+   return "";	
+   dec = parseFloat(du) + parseFloat(min / 60) + parseFloat(sec / 3600); 
+   return dec; 
+} 
+
+
+
+function getGps() { 
+	
+	if($("#checkgps").attr("checked")){
+		getGpsPoint();
+	}else{
+		cleanGpsField();
+		
+	}
+	//alert('取得定位');
+}
+
+function cleanGpsField() { 
+	var select=$('input[name=lonlat]:checked').val();
+	if(select=="degree")
+	{ 
+		$("#degree_lat").val("");	
+		$("#degree_lon").val("");	
+	}else{
+		$("#deg_lat_du").val("");
+	    $("#deg_lat_min").val("");
+	    $("#deg_lat_sec").val("");
+	    $("#deg_lon_du").val("");
+	    $("#deg_lon_min").val("");
+	    $("#deg_lon_sec").val("");
+	}
+}
+
+function getGpsPoint() { 
+	   $("#div_body").mask("定位中...");
+	   var options = {
+
+	        enableHighAccuracy: true,
+	        timeout: 45000
+
+	    };
+	    navigator.geolocation.getCurrentPosition(successHandler, errorHandler, options);
+}
+
+
+// successCallback
+
+function successHandler (location) {
+	var lat=location.coords.longitude;
+	var lon=location.coords.latitude;
+	var select=$('input[name=lonlat]:checked').val();
+	if(select=="degree")
+	{ 
+		
+			$("#degree_lat").val(lat);	
+			$("#degree_lon").val(lon);	
+	
+	}else{
+		var declat=decToDeg(lat);
+		var declon=decToDeg(lon);
+	    $("#deg_lat_du").val(declat.split('-')[0]);
+	    $("#deg_lat_min").val(declat.split('-')[1]);
+	    $("#deg_lat_sec").val(declat.split('-')[2]);
+	    $("#deg_lon_du").val(declon.split('-')[0]);
+	    $("#deg_lon_min").val(declon.split('-')[1]);
+	    $("#deg_lon_sec").val(declon.split('-')[2]);
+	}
+	$("#div_body").unmask();
+//    alert(location.coords.latitude+ ","+location.coords.longitude);
+//    alert(location.coords.accuracy);  
+}
+
+
+
+// errorCallback
+
+function errorHandler (error) {
+	$("#div_body").unmask();
+	switch(error.code) 
+    {
+    case error.PERMISSION_DENIED:
+      alert("定位功能尚未開啟");
+      cleanGpsField();
+      break;
+    case error.POSITION_UNAVAILABLE:
+      alert("無法取得所在位置");
+      cleanGpsField();
+      break;
+    case error.TIMEOUT:
+      alert("取得連線逾時，請稍後再試");
+      cleanGpsField();
+      break;
+    case error.UNKNOWN_ERROR:
+      cleanGpsField();
+      alert("不明的錯誤");
+      break;
+    }
+  
+
+}
+
+function gpsQuery(){
+	//測試(正式要拿掉)
+//	init_city='O';
+//	$("#deg_lat_du").val('121');
+//	$("#deg_lat_min").val('00'); 
+//	$("#deg_lat_sec").val('38.24');
+//	$("#deg_lon_du").val('24');
+//	$("#deg_lon_min").val('47');
+//	$("#deg_lon_sec").val('04.41');
+	//測試(正式要拿掉)
+	code='';
+	var project='K';
+	var lat;
+	var lon;
+	var select=$('input[name=lonlat]:checked').val();
+	if(select=="degree")
+	{ 
+		lat=$("#degree_lat").val();	
+		lon=$("#degree_lon").val();	
+	}else{
+	    lat=degToDec($("#deg_lat_du").val(),$("#deg_lat_min").val(), $("#deg_lat_sec").val());
+	    lon=degToDec($("#deg_lon_du").val(),$("#deg_lon_min").val(),$("#deg_lon_sec").val());	
+	}
+	if((lat=="")||(lon=="")){
+		alert('請輸入坐標');
+		return;
+	}
+
+	var data = new Object();
+	data.project=project;
+	data.WGS84_x=lat;
+	data.WGS84_y=lon;
+	toGetCmd(data);	
+	data=null;	
+	
+}
+
+function setGpsQuery(x,y){
+	//原本的碼
+//	$('#degree_lat').val(x);
+//	$('#degree_lon').val(y);
+//	$('#degree_lon_lat').val(y+','+x);
+	//原本的碼
+	var show_x=x.toFixed(6);
+	var show_y=y.toFixed(6);
+	$('#degree_lat').val(show_x);
+	$('#degree_lon').val(show_y);
+	$('#degree_lon_lat').val(show_x+','+show_y);
+}
+
+
+
+function pointLocate(){
+	try{
+	var x=$("#locate_x").val();
+	var y=$("#locate_y").val();
+	if(x==""){
+		alert('請輸入經度');
+		return;
+	}
+	if(y==""){
+		
+		alert('請輸入緯度');
+		return;
+	}
+	var show_text="(x坐標:"+x+",y坐標:"+y+")";
+	toLocate(x,y,show_text);
+	setGpsQuery(x,y);
+	$( "#dialog-location" ).dialog('close');
+	}catch(e){
+		alert('定位失敗');
+	}
+}
+
+
+function googleLocate(){
+	try{
+		var xy=$("#locate_xy").val();
+		if(xy==""){
+			alert('請輸入google經緯度坐標');
+			return;
+		}
+		var x=xy.split(',')[1];
+		var y=xy.split(',')[0];
+		var show_text="(x坐標:"+x+",y坐標:"+y+")";
+		toLocate(x,y,show_text);
+		setGpsQuery(x,y);
+		$( "#dialog-location" ).dialog('close');
+	}catch(e){
+			alert('定位失敗');
+	}
+}
+
+function toLocate(x,y,show_text){
+	map.removeLayer(locate_mark);
+	x=x.trim();
+	y=y.trim();
+	x=parseFloat(x);
+	y=parseFloat(y);
+	var mark_point=new ol.geom.Point(ol.proj.transform([x,y], 'EPSG:4326', 'EPSG:3857'));
+	locate_mark=getMarker(mark_point,'locate',mark_img1,show_text);
+	map.addLayer(locate_mark);
+	var point = ol.proj.fromLonLat([x,y]);
+    var view = new ol.View({center: point,zoom:17});
+    map.setView(view);
+//	pointPan(point);
+}
+
+   
+
+

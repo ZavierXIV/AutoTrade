@@ -1,0 +1,162 @@
+// 
+//var map_source=new ol.source.Vector ({
+//    url: 'json/map1.json',
+//    format: new ol.format.GeoJSON()
+//});
+//
+//var map_vector   = new ol.layer.Vector({
+//        source: map_source,
+//        style: styleFunction
+// });
+
+var map_vector;
+var AllSect_vector;
+var map_source;
+function loadLandMap(json_data,setStyleFunction){//讀地籍圖
+	  map_source=getMapSource(json_data);
+	 map_vector=getMapVector(map_source,setStyleFunction);
+     map.addLayer(map_vector); 
+     toZoomExtend(map,map_source);//ZOOM
+     map.addLayer(vector);
+}
+
+function loadSectMap(json_data){//讀段地籍圖
+	map.removeLayer(AllSect_vector);
+	var sect_map_source=getMapSource(json_data);
+	AllSect_vector=getMapVector(sect_map_source,styleSectFunction);
+    map.addLayer(AllSect_vector); 
+}
+
+
+function getMapSource(json_data){
+	 var map_source = new ol.source.Vector({
+		  features: (new ol.format.GeoJSON()).readFeatures(json_data, {
+	        featureProjection: "EPSG:3857"
+	    })
+		});
+	 return map_source;
+}
+
+function getMapVector(map_source,styleFunction){
+	 var vector   = new ol.layer.Vector({
+	      source: map_source,
+	      style: styleFunction
+	     });  
+	 return vector;
+}
+
+
+
+//function loadLandMap(url){//讀地籍圖
+//	  map.setTarget('map');
+//	  map.setView(view);
+//	  map_source=new ol.source.Vector ({
+//	        url: url,
+//	        format: new ol.format.GeoJSON()
+//	      });
+//
+//	   map_vector   = new ol.layer.Vector({
+//	        source: map_source,
+//	        style: styleFunction
+//	  });  
+//	
+//	  map.addLayer(map_vector); 
+//	  extentVectorView(map,map_vector,map_source);
+//	  map.addLayer(vector);//加入測量線圖層
+//}
+
+
+var build_image;
+var simage_url;
+function loadImage(url){//載入圖片
+	simage_url=url;
+	 map.setTarget('map');
+	 map.setView(view);
+	 
+	 if(build_image!=undefined)
+		 map.removeLayer(build_image);
+	 showSendMsg("載圖中…");
+	 build_image=new ol.layer.Image({
+	      source: new ol.source.ImageStatic({
+//	        attributions: [
+//	          new ol.Attribution({
+//	            html: '&copy; <a href="http://xkcd.com/license.html">xkcd</a>'
+//	          })
+//	        ],
+	        url: url,
+	        projection: projection,
+	        imageExtent: extent,
+	        imageLoadFunction: function(image, src) {
+	            var imageElement = image.getImage();
+	            imageElement.onload = function() {
+	              //console.log('loaded');
+	          	hideSendMsg();
+	          	
+	            };
+	            imageElement.src = src;
+	            
+	            //測試
+//	        	view =new ol.View({
+//	        	    projection: projection,
+//	        	    center: ol.extent.getCenter(extent),
+//	        	    zoom: 2
+//	        	  });
+	        
+	            console.log(image.extent);
+	          
+	            //測試
+	          }
+	      })
+		
+	
+	});	 
+	 map.addLayer(build_image);
+}
+
+
+
+function addMapCtrl(){
+	  map.addControl(measure_ctl);
+	  map.addControl(showLand_ctl);
+	  map.addControl(zoom_ctl);
+	  map.addControl(scal_ctl);	
+	  map.addControl(dxf_ctl);	
+	  map.addControl(sect_ctl);	
+	  map.addControl(rent_ctl);	
+	  map.addControl(area_ctl);	
+//	  map.addControl(kml_ctl);//暫時關閉kml按鈕	
+	  map.addControl(gps_ctl);
+	  map.addControl(cleanExt_clt);
+//	  if(EDOC_btn=="*")
+//	  map.addControl(edoc_ctl);	 
+	  if("B"==DLData.city)
+	  map.addControl(g158_ctl);
+	  if("H"==DLData.city)
+	  map.addControl(taobao_ctl);
+//	  if(EDOC_btn!="*"){//騰本按鈕沒出現時要去搬動後面的按鈕
+//			
+//			 $(".G158").css("right","352px");	
+//			 $(".TaoBao").css("right","352px");	
+//	 }
+
+}
+
+function addHomeMapCtrl(){
+	  map.addControl(gps_ctl2);
+	  map.addControl(showLand_ctl2);
+	  map.addControl(rent_ctl2);	
+	  map.addControl(lonlat_clt);	
+	  map.addControl(address_clt);	
+//	  map.addControl(point_clt);	
+}
+
+function addGoalsMapCtrl(){
+	map.addControl(pdf_ctl);
+}
+
+
+function addBuildMapCtrl(){
+	map.addControl(dxf_ctl2);
+	map.addControl(zoom_ctl2);
+	map.addControl(rent_ctl);
+}

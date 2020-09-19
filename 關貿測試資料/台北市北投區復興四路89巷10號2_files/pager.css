@@ -1,0 +1,31 @@
+a {
+     color: #005BD8;
+}
+a:hover {
+     color: #005BD8;
+}
+.pager_examples {
+     border: 1px solid #999;
+     /*margin: 10px 0;*/
+     width: 100%;
+}
+.pager_examples p, h4 {
+     padding: 5px;
+     margin: 0;
+}
+.pager_examples .nav {
+     background: #eee;
+     border-top: 1px solid #999;
+     padding: 5px;
+}
+.pager_examples .nav#nav2 {
+     border-top: 0;
+     border-bottom: 1px solid #999;
+}
+.pager_examples .nav a {
+     padding: 0 5px;
+}
+.pager_examples .nav a.highlight {
+     color: #000;
+     font-weight: bold;
+}

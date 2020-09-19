@@ -1,0 +1,1031 @@
+﻿@charset "utf-8";
+#wrapper {
+	margin: auto;
+	width: 1000px;
+}
+#menu {
+	margin-right: 0%;
+	margin-left: 0%;
+	font-weight: normal;
+	margin-top: 4px;
+	float: left;
+}
+#menu ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  line-height: 1;
+  display: block;
+  zoom: 1;
+}
+#menu ul:after {
+  content: " ";
+  display: block;
+  font-size: 0;
+  height: 0;
+  clear: both;
+  visibility: hidden;
+}
+#menu ul li {
+  display: inline-block;
+  padding: 0;
+  margin: 0;
+}
+#menu.align-right ul li {
+  float: right;
+}
+#menu.align-center ul {
+  text-align: center;
+}
+#menu ul li a {
+	color: #4F3100;
+	text-decoration: none;
+	display: block;
+	font-family: sans-serif;
+	text-transform: uppercase;
+	position: relative;
+	-webkit-transition: color .25s;
+	-moz-transition: color .25s;
+	-ms-transition: color .25s;
+	-o-transition: color .25s;
+	transition: color .25s;
+	font-weight: normal;
+	line-height: 1.2em;
+	padding-right: 6px;
+	padding-left: 6px;
+}
+#menu ul li a:hover {
+	color: #ffffff;
+}
+#menu ul li a:hover:before {
+  width: 100%;
+}
+#menu ul li a:after {
+	content: "";
+	display: block;
+	position: absolute;
+	right: -3px;
+	top: 22px;
+	height: 1px;
+	width: 1px;
+	opacity: .5;
+	background-color: #FFFFFF;
+}
+#menu ul li a:before {
+	content: "";
+	display: block;
+	position: absolute;
+	left: 0px;
+	bottom: 0px;
+	height: 3px;
+	width: 0;
+	-webkit-transition: width .25s;
+	-moz-transition: width .25s;
+	-ms-transition: width .25s;
+	-o-transition: width .25s;
+	transition: width .25s;
+	background-color: #ff6c00;
+}
+#menu ul li.last > a:after,
+#menu ul li:last-child > a:after {
+  display: none;
+}
+#menu ul li.active a {
+	color: #ffffff;
+	font-weight: normal;
+}
+#menu ul li.active a:before {
+  width: 100%;
+}
+#menu.align-right li.last > a:after,
+#menu.align-right li:last-child > a:after {
+  display: block;
+}
+#menu.align-right li:first-child a:after {
+  display: none;
+}
+
+html{ margin:0; height:100%; }
+#tr_td { height: 100%; }
+body {
+	background-color: #FFF;
+	background-image: url(../../images/hinet/container_bg.gif);
+	background-repeat: repeat-x;
+	background-position: center 3px;
+	margin:0; 
+	width: 100%;
+	height: 100%;
+}
+
+/* ~~ 元素/標籤選取器 ~~ */
+ul, ol, dl { /* 由於瀏覽器之間的差異，最佳作法是在清單中使用零寬度的欄位間隔及邊界。為了保持一致，您可以在這裡指定所要的量，或在清單包含的清單項目 (LI、DT、DD) 上指定所要的量。請記住，除非您寫入較為特定的選取器，否則在此執行的作業將重疊顯示到 .nav 清單。 */
+	padding: 0;
+	margin: 0;
+}
+h1, h2, h3, h4, h5, h6, p {
+	margin-top: 0;	
+	padding-right: 15px;
+	padding-left: 15px;
+}
+a img { 
+	border: none;
+}
+
+
+a:link {
+	/*text-decoration: none;*/ 
+	color: #333333;
+	font-weight: normal;
+}
+a:hover, a:active, a:focus { 
+	text-decoration: none;
+	color: #DE5900;
+}
+a:visited {
+	color: #333333;
+	text-decoration: underline;
+}
+
+/*.title_img {
+	margin-top: 9px;
+	margin-left: 30px;
+}*/
+
+.title_img {
+	margin-top: 0px;
+	margin-left: 0px;
+	margin-right: 0px;
+	padding-right: 0px;
+	padding-left: 0px;
+	float: left;
+	height: 50px;
+	width: 235px;
+	
+}
+
+
+.menubar_right {
+	float: right;
+	margin-top: 13px;
+}
+  
+ #unfolding {
+	position: absolute;
+	width: 14px;
+	height: 28px;
+	z-index: 6;
+	left: 236px;
+	top: 52px;
+}
+.cost_bar {
+	color: #017cd2;
+	font-weight: bold;
+	background-color: #e2f3ff;
+	padding-top: 5px;
+	padding-bottom: 5px;
+	margin-bottom: 5px;
+	margin-top: 10px;
+	font-size: 15px;
+	padding-left: 2px;
+	clear: both;
+	border-top: 1px solid #9BD6FF;
+	border-bottom: 1px solid #9BD6FF;
+}
+.info_img {
+	margin-left: 5px;
+	vertical-align: text-top;
+}
+
+
+
+ul.record {
+	list-style: none;
+	padding: 0px;
+	margin-top: 3px;
+	margin-bottom: 10px;
+	margin-left: 5px;
+	margin-right: 0em;
+	float: left;
+}
+ul.record li {
+	background-image: url(../../images/tradevan/record.png);
+	background-repeat: no-repeat;
+	background-position: left top;
+}
+ul.record a {
+	text-decoration: none;
+	font-family: Arial, "微軟正黑體";
+	font-size: 16px;
+	text-align: left;
+	color: #017cd2;
+	font-weight: normal;
+	font-smoothing: subpixek-antialiased;
+	display: inline;
+	padding-bottom: 0px;
+	vertical-align: text-top;
+	padding-top: 0px;
+	padding-right: 0px;
+	line-height: 18px;
+	padding-left: 23px;
+}
+ul.record a:hover {
+	color: #CC3800;
+	text-decoration: none;
+	font-weight: bold;
+}
+ul.ins {
+	list-style: none;
+	float: left;
+	margin-top: 3px;
+	margin-bottom: 10px;
+	margin-left: 10px;
+	margin-right: 0em;
+	border-left-width: 1px;
+	border-left-style: solid;
+	border-left-color: #C3C3C3;
+	padding-right: 0px;
+	padding-bottom: 0px;
+	padding-left: 10px;
+	padding-top: 0px;
+	height: 20px;
+}
+ul.ins li {
+	background-image: url(../../images/tradevan/ins.png);
+	background-repeat: no-repeat;
+	background-position: left top;
+}
+ul.ins a {
+	text-decoration: none;
+	font-family: Arial, "微軟正黑體";
+	font-size: 16px;
+	text-align: left;
+	color: #017cd2;
+	font-weight: normal;
+	font-smoothing: subpixek-antialiased;
+	display: inline;
+	vertical-align: text-top;
+	padding-top: 0px;
+	padding-right: 0px;
+	padding-bottom: 0px;
+	padding-left: 23px;
+	line-height: 18px;
+}
+.search_text_2 {
+	font-family: Arial, "微軟正黑體";
+	font-size: 14px;
+	line-height: 15px;
+	padding-top: 0px;
+	padding-right: 3px;
+	padding-bottom: 0px;
+	padding-left: 3px;
+	margin-bottom: 5px;
+	color: #000;
+	font-weight: bold;
+	clear: none;
+	float: left;
+}
+ul.ins a:hover {
+	color: #CC3800;
+	text-decoration: none;
+	font-weight: bold;
+}
+.search_text {
+	font-size: 14px;
+	font-weight: normal;
+	color: #000000;
+	font-family: Arial, "微軟正黑體";
+	margin-left: 7px;
+	line-height: 30px;
+	float: left;
+}
+.search_border {
+	border: 1px solid #999;
+	font-family: Arial, "微軟正黑體";
+	font-size: 15px;
+	color: #333;
+	font-weight: normal;
+	margin-right: 3px;
+	margin-left: 3px;
+	padding-top: 2px;
+	padding-right: 1px;
+	padding-bottom: 2px;
+	padding-left: 1px;
+}
+.search_box_border {
+	font-family: Arial, "微軟正黑體";
+	border: 2px solid #d9d9d9;
+	background-color: #f9f9f9;
+	width: 215px;
+	margin-right: auto;
+	margin-left: 3px;
+	font-size: 14px;
+	line-height: 25px;
+	font-weight: bold;
+	margin-top: 5px;
+	margin-bottom: 5px;
+	clear: both;
+	padding-top: 2px;
+	padding-right: 2px;
+	padding-bottom: 3px;
+	padding-left: 5px;
+	color: #000;
+}
+.input_box1 {
+	color: #000;
+	font-family: Arial, "微軟正黑體";
+	font-size: 14px;
+	font-weight: normal;
+	padding: 3px;
+	margin-left: 3px;
+	border: 1px solid #999;
+	width: 35px;
+}
+.input_box2 {
+	color: #000;
+	font-family: Arial, "微軟正黑體";
+	font-size: 14px;
+	font-weight: normal;
+	padding: 3px;
+	margin-left: 3px;
+	border: 1px solid #999;
+	width: 90px;
+}
+.input_box3 {
+	color: #000;
+	font-family: Arial, "微軟正黑體";
+	font-size: 14px;
+	font-weight: normal;
+	padding: 3px;
+	margin-left: 47px;
+	border: 1px solid #999;
+	width: 155px;
+}
+.input_box4 {
+	color: #000;
+	font-family: Arial, "微軟正黑體";
+	font-size: 14px;
+	font-weight: normal;
+	padding: 3px;
+	border: 1px solid #999;
+	width: 135px;
+	margin-left: 5px;
+}
+.select_box1 {
+	color: #000;
+	font-family: Arial, "微軟正黑體";
+	font-size: 14px;
+	font-weight: normal;
+	padding: 1px;
+	margin-left: 3px;
+	border: 1px solid #999;
+	width: 70px;
+	background-color: #F3FCEB;
+}
+.select_box2 {
+	color: #000;
+	font-family: Arial, "微軟正黑體";
+	font-size: 14px;
+	font-weight: normal;
+	padding: 1px;
+	margin-left: 3px;
+	border: 1px solid #999;
+	width: 85px;
+	background-color: #F3FCEB;
+}
+.select_box3 {
+	color: #000;
+	font-family: Arial, "微軟正黑體";
+	font-size: 14px;
+	font-weight: normal;
+	padding: 1px;
+	margin-left: 3px;
+	border: 1px solid #999;
+	width: 145px;
+	background-color: #F3FCEB;
+}
+.select_box4 {
+	color: #000;
+	font-family: Arial, "微軟正黑體";
+	font-size: 14px;
+	font-weight: normal;
+	padding: 1px;
+	margin-left: 3px;
+	border: 1px solid #999;
+	width: 150px;
+	background-color: #F3FCEB;
+}
+.select_text {
+	color: #000;
+	font-family: Arial, "微軟正黑體";
+	font-size: 14px;
+	font-weight: normal;
+	padding: 1px;
+	margin-left: 3px;
+}
+.news_text {
+	font-family: Arial, "微軟正黑體";
+	font-style: normal;
+	font-size: 15px;
+	line-height: 20px;
+	color: #494949;
+	list-style-image: url(../../images/hinet/dot.png);
+	padding-bottom: 0px;
+	font-weight: normal;
+	margin-left: 17px;
+	list-style-position: outside;
+	float: left;
+	width: 190px;
+	word-break: break-all;
+}
+.news_text li {
+	padding-bottom: 5px;
+	padding-top: 5px;
+}
+
+#unfolding2 {
+	position: absolute;
+	width: 14px;
+	height: 28px;
+	z-index: 4;
+	left: 412px;
+	top: 52px;
+}
+.d_btn {
+	font-size: 20px;
+	text-decoration: none;
+	color: #321400;
+	display: inline-block;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	border-radius: 8px;
+	background-color: #ff9407;
+	background-image: -webkit-linear-gradient(270deg,rgba(255,230,162,1.00) 0%,rgba(255,148,7,1.00) 100%);
+	background-image: -moz-linear-gradient(270deg,rgba(255,230,162,1.00) 0%,rgba(255,148,7,1.00) 100%);
+	background-image: -o-linear-gradient(270deg,rgba(255,230,162,1.00) 0%,rgba(255,148,7,1.00) 100%);
+	background-image: linear-gradient(180deg,rgba(255,230,162,1.00) 0%,rgba(255,148,7,1.00) 100%);
+	border: 1px solid #FFA32B;
+	width: 222px;
+	text-align: center;
+	letter-spacing: 5px;
+	font-weight: normal;
+	padding-top: 5px;
+	padding-bottom: 5px;
+	line-height: 20px;
+	margin-top: 5px;
+	margin-bottom: 10px;
+	margin-left: 3px;
+	margin-right: auto;
+	-webkit-box-shadow: 1px 1px 2px rgba(208,208,208,1.00);
+	box-shadow: 1px 1px 2px rgba(208,208,208,1.00);
+}.d_btn:hover {
+	font-size: 20px;
+	text-decoration: none;
+	color: #321400;
+	display: inline-block;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	border-radius: 8px;
+	background-color: #ff9407;
+	background-image: -webkit-linear-gradient(270deg,rgba(255,217,114,1.00) 0%,rgba(255,99,6,1.00) 100%);
+	background-image: -moz-linear-gradient(270deg,rgba(255,217,114,1.00) 0%,rgba(255,99,6,1.00) 100%);
+	background-image: -o-linear-gradient(270deg,rgba(255,217,114,1.00) 0%,rgba(255,99,6,1.00) 100%);
+	background-image: linear-gradient(180deg,rgba(255,217,114,1.00) 0%,rgba(255,99,6,1.00) 100%);
+	border: 1px solid #E78300;
+	width: 222px;
+	text-align: center;
+	letter-spacing: 5px;
+	font-weight: normal;
+	padding-top: 5px;
+	padding-bottom: 5px;
+	line-height: 20px;
+	margin-top: 5px;
+	margin-bottom: 10px;
+	margin-left: 3px;
+	margin-right: auto;
+}.d_btn:active {
+	position: relative;
+	top: 1px;
+	text-decoration: none;
+}
+
+.b_btn {
+	display: inline-block;
+	background-image: url(../images/search_br.png);
+	background-repeat: no-repeat;
+	background-position: center center;
+	height: 26px;
+	width: 26px;
+	-moz-border-radius: 3px;
+	-webkit-border-radius: 3px;
+	border-radius: 3px;
+}
+   
+.b_btn:hover {
+	background-image: url(../images/search_br_o.png);
+	background-repeat: no-repeat;
+	background-position: center center;
+	-moz-border-radius: 3px;
+	-webkit-border-radius: 3px;
+	border-radius: 3px;	
+}.b_btn:active {
+	position: relative;
+	top: 1px;
+	-moz-border-radius: 3px;
+	-webkit-border-radius: 3px;
+	border-radius: 3px;
+}
+   
+.sub_titlebar {
+	font-size: 17px;
+	font-weight: bold;
+	color: #0a0a0a;
+	background: -moz-linear-gradient( center top, #ffffff 5%, #d1d1d1 100% );
+	background: -ms-linear-gradient( top, #ffffff 5%, #d1d1d1 100% );
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffff', endColorstr='#d1d1d1');
+	background: -webkit-gradient( linear, left top, left bottom, color-stop(5%, #ffffff), color-stop(100%, #d1d1d1) );
+	background-color: #ffffff;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+	border-bottom-color: #bababa;
+	border-top-width: 1px;
+	border-top-style: solid;
+	border-top-color: #dedede;
+	letter-spacing: 1px;
+	margin-top: 0px;
+	line-height: 27px;
+	margin-bottom: 10px;
+	clear: both;
+	margin-left: 0px;
+	padding-top: 0px;
+	padding-right: 0px;
+	padding-bottom: 0px;
+	padding-left: 20px;
+}
+
+.search_box {
+	width: 150px;
+	float: left;
+	height: 26px;
+	color: #7B7B7B;
+	font-size: 0.875em;
+	border: 2px solid #c9c9c9;
+	background-color: #FFF;
+	font-weight: normal;
+	-moz-border-radius: 3px;
+	-webkit-border-radius: 3px;
+	border-radius: 3px;
+	margin-left: 5px;
+}
+.search_btn {
+	height: 26px;
+	width: 26px;
+	margin-left: 5px;
+	float: left;
+
+}
+.transition {
+	-webkit-transition: all 1s ease 0s;
+	-o-transition: all 1s ease 0s;
+	transition: all 1s ease 0s;
+}
+.transition:hover {
+	-webkit-opacity: 0.6;
+	opacity: 0.6;
+}
+.detailItem_text {
+	font-style: normal;
+	font-size: 15px;
+	color: #000000;
+	list-style-image: url(../images/sub_option.png);
+	font-variant: normal;
+	font-weight: normal;
+	list-style-position: inside;
+	float: left;
+	width: 198px;
+	line-height: 16px;
+	padding: 0px;
+}
+.item_text {
+	font-size: 15px;
+	line-height: 16px;
+	font-weight: bold;
+	color: #333;
+}
+   
+.item {
+	margin-left: 5px;
+	float: left;
+	width: 190px;
+	margin-top: 10px;
+}
+   
+.detailItem_text li {
+	padding-top: 3px;
+	padding-bottom: 3px;
+	margin-left: 20px;
+	float: left;
+	clear: both;
+}
+
+.container {
+	width:100%;
+	height:100%;
+	background-color: #FFF;
+	
+}
+
+.header {
+	float: left;
+	height: 51px;
+	min-width: 100%;
+	margin-top: 0px;
+	border-bottom: 1px solid rgba(235,235,235,1.00);
+	background-image: -webkit-linear-gradient(270deg,rgba(255,237,216,1.00) 0%,rgba(255,255,255,1.00) 46.63%), url(../../images/tradevan/bg.png);
+	background-image: -moz-linear-gradient(270deg,rgba(255,237,216,1.00) 0%,rgba(255,255,255,1.00) 46.63%), url(../../images/tradevan/bg.png);
+	background-image: -o-linear-gradient(270deg,rgba(255,237,216,1.00) 0%,rgba(255,255,255,1.00) 46.63%), url(../../images/tradevan/bg.png);
+	background-image: linear-gradient(180deg,rgba(255,237,216,1.00) 0%,rgba(255,255,255,1.00) 46.63%), url(../../images/tradevan/bg.png);
+	background-repeat: repeat-x;
+	background-position: 50% 0;
+}
+
+#sidebar1 {
+	height: 100%;
+	/*z-index: 2;*/
+	border-right-width: 1px;
+	border-right-style: solid;
+	border-right-color: #bababa;
+	margin-left: 0px;
+	padding-top: 10px;
+	
+}
+
+#sidebar2 {
+
+	/*z-index: 3;*/
+	border-right-width: 1px;
+	border-right-style: solid;
+	border-right-color: #bababa;
+	height: 100%;
+	padding-top: 0px;
+	overflow: auto;
+	
+}
+
+#content {
+
+	/*z-index: 5;*/
+	width:auto;
+	height: 100%;
+	margin:0; 
+	overflow-y:hidden;
+}
+.remark {
+	font-family: Arial, "微軟正黑體";
+	font-size: 16px;
+	line-height: 20px;
+	font-weight: normal;
+	color: #8e6f39;
+	margin-top: 10px;
+}
+.content_TitleText {
+	font-family: Arial, "微軟正黑體";
+	font-size: 21px;
+	font-weight: bold;
+	line-height: 30px;
+	color: #000;
+}
+/*CSS yahoo style pagination*/
+div.baseline {
+	TEXT-ALIGN: center;
+	border: 1px solid #E7E7E7;
+	margin-top: 5px;
+	margin-bottom: 5px;
+	padding-top: 7px;
+	padding-right: 5px;
+	padding-bottom: 7px;
+	padding-left: 5px;
+}
+div.baseline a {
+	border: 1px solid #fff;
+	text-decoration: underline;
+	color: #303030;
+	margin: 2px;
+	padding-top: 2px;
+	padding-right: 5px;
+	padding-bottom: 2px;
+	padding-left: 5px;
+}
+div.baseline a:hover {
+	color: #4399EA;
+	border: 1px solid #4399ea;
+}
+div.baseline a:active {
+	color: #4399ea;
+	border: 1px solid #4399ea;
+}
+div.baseline span.current {
+	border: 1px solid #FFF;
+	margin: 2px;
+	padding-top: 2px;
+	padding-right: 5px;
+	padding-bottom: 2px;
+	padding-left: 5px;
+	font-weight: bold;
+	background-color: #FFF;
+	color: #000;
+}
+div.baseline span.disabled {
+	border: 1px solid #eee;
+	color: #ddd;
+	margin: 2px;
+	padding-top: 2px;
+	padding-right: 5px;
+	padding-bottom: 2px;
+	padding-left: 5px;
+}
+.map_tools {
+	width: 90%;
+	margin-left: 50px;
+	margin-top: 5px;
+	margin-bottom: 5px;
+}
+
+.country {
+	color: #000;
+	font-family: Arial, "微軟正黑體";
+	font-size: 14px;
+	font-weight: normal;
+	padding: 1px;
+	margin-left: 3px;
+	border: 1px solid #999;
+	width: 70px;
+	background-color: #FFF7EE;
+}
+
+.township {
+	color: #000;
+	font-family: Arial, "微軟正黑體";
+	font-size: 14px;
+	font-weight: normal;
+	padding: 1px;
+	margin-left: 3px;
+	border: 1px solid #999;
+	width: 85px;
+	background-color: #FFF7EE;
+}
+
+.section {
+	color: #000;
+	font-family: Arial, "微軟正黑體";
+	font-size: 14px;
+	font-weight: normal;
+	padding: 1px;
+	margin-left: 3px;
+	border: 1px solid #999;
+	width: 145px;
+	background-color: #FFF7EE;
+}
+
+.sectioncode {
+	color: #000;
+	font-family: Arial, "微軟正黑體";
+	font-size: 14px;
+	font-weight: normal;
+	padding: 3px;
+	margin-left: 3px;
+	border: 1px solid #999;
+	width: 35px;
+}
+
+#projectL {
+	color: #000;
+	font-family: Arial, "微軟正黑體";
+	font-size: 14px;
+	font-weight: normal;
+	padding: 1px;
+	margin-left: 3px;
+	border: 1px solid #999;
+	width: 150px;
+	background-color: #FFF7EE;
+}
+
+#projectB {
+	color: #000;
+	font-family: Arial, "微軟正黑體";
+	font-size: 14px;
+	font-weight: normal;
+	padding: 1px;
+	margin-left: 3px;
+	border: 1px solid #999;
+	width: 150px;
+	background-color: #FFF7EE;
+}
+
+.number{
+	color: #000;
+	font-family: Arial, "微軟正黑體";
+	font-size: 14px;
+	font-weight: normal;
+	padding: 3px;
+	margin-left: 3px;
+	border: 1px solid #999;
+	width: 90px;
+}
+
+/*.form_list_title {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 75%;
+	line-height: 18px;
+	font-weight: bold;
+	color: #366;
+	background-color: #DEEFEF;
+	padding-top: 5px;
+	padding-right: 10px;
+	padding-bottom: 5px;
+	padding-left: 10px;
+	margin: 1px;
+	/*text-align: left;*/
+	text-align: center;
+	border: 1px dotted #AAD2D2;
+}
+.form_list {
+	border: 1px dotted #96CBCB;
+	/*text-align: left;*/
+	text-align: center;
+	padding-top: 5px;
+	padding-right: 10px;
+	padding-bottom: 5px;
+	padding-left: 10px;
+	font-size: 15px;
+	color: #960;
+	font-family: Arial, Helvetica, sans-serif, "細明體";
+	line-height: 18px;
+}
+
+.form_door_list {
+	border: 1px dotted #96CBCB;
+	/*text-align: left;*/
+	text-align: center;
+	padding-top: 5px;
+	padding-right: 10px;
+	padding-bottom: 5px;
+	padding-left: 10px;
+	font-size: 100%;
+	color: #960;
+	font-family: Arial, Helvetica, sans-serif, "細明體";
+	line-height: 18px;
+}*/
+
+.select_box {
+	color: #000;
+	font-family: Arial, "微軟正黑體";
+	font-size: 14px;
+	font-weight: normal;
+	padding: 1px;
+	margin-left: 3px;
+	border: 1px solid #999;
+	background-color: #FFF7EE;
+}
+
+.dis_select_box {
+	color: #000;
+	font-family: Arial, "微軟正黑體";
+	font-size: 14px;
+	font-weight: normal;
+	padding: 1px;
+	margin-left: 3px;
+	border: 1px solid #999;
+	background-color: #DDDDDD;
+}
+
+a.class_box:link {
+	/*text-align: left;*/
+	text-align: center;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 15px;
+	line-height: 30px;
+	color: #960;
+	text-decoration: none;
+	margin: 0px;
+	display: block;
+}
+
+a.class_box:visited {
+	margin: 0px;
+	/*text-align: left;*/
+	text-align: center;
+	color: #960;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 15px;
+	line-height: 30px;
+	display: block;
+	text-decoration: none;
+}
+a.class_box:hover {
+	padding: 0px;
+	text-decoration: underline;
+	/*text-align: left;*/
+	text-align: center;
+	color: #333;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 15px;
+	line-height: 30px;
+	margin: 0px;
+	display: block;
+	background-color: #DEEFEF;
+}
+
+.Search {
+	font-family: "Times New Roman", Times, serif;
+	font-size: 14pt;
+	line-height: 35px;
+	color: #790000;
+	padding-left: 0px;
+	letter-spacing: 1px;
+	padding-top: 5px;
+	font-weight: bold;
+	text-decoration: none;
+	text-align: left;
+	padding-right: 0px;
+}
+
+.tunnel_doorname {
+	color: #000;
+	font-family: Arial, "微軟正黑體";
+	font-size: 14px;
+	font-weight: normal;
+	padding: 1px;
+	margin-left: 3px;
+	border: 1px solid #999;
+	background-color: #FFF7EE;
+}
+
+.alley_doorname {
+	color: #000;
+	font-family: Arial, "微軟正黑體";
+	font-size: 14px;
+	font-weight: normal;
+	padding: 1px;
+	margin-left: 3px;
+	border: 1px solid #999;
+	background-color: #FFF7EE;
+}
+
+
+l.nav {
+	list-style: none; /* 這會建立連結的上方邊框，其他則都會使用下方邊框放置在 LI 上 */
+	margin-bottom: 10px;
+}
+ul.nav li {
+	border-bottom-width: 1px;
+	border-bottom-style: dotted;
+	border-bottom-color: #666;
+	list-style-type:none;
+}
+ul.nav a, ul.nav a:visited { /* 將這些選取器放入群組，即可確保您的連結即使在受到點擊後仍保有按鈕外觀 */
+	display: block; /* 這會為連結提供區塊屬性，使連結能填滿包含它的整個 LI，讓整個區域都能回應滑鼠點按動作。 */
+	text-decoration: none;
+	color: #808080;
+	padding-top: 3px;
+	padding-right: 2px;
+	padding-bottom: 3px;
+	padding-left: 15px;
+}
+ul.nav a:hover, ul.nav a:active, ul.nav a:focus { /* 這會同時變更滑鼠及鍵盤導覽器的背景及文字顏色 */
+	color: #42551A;
+	background-color: #C0DBF6;
+}
+
+.markClass{
+	width: 150px;
+	background-color: #FFF7EE;
+}
+
+.markType{
+	width: 150px;
+	background-color: #FFF7EE;
+}
+
+.landmark{
+	width: 150px;
+	background-color: #FFF7EE;
+}
+
+
+
+

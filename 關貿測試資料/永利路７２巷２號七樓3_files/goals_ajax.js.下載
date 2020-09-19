@@ -1,0 +1,68 @@
+var pdf_cmd;//用來在地圖上送命令的全域變數
+var ask_send=true;
+function goalsQry() {
+var project="MB";
+var city=$(".country").find('option:selected').val();
+var town=$(".township").find('option:selected').val();
+var sect=$(".section").find('option:selected').val();
+var paper_size=$(".paperSize").find('option:selected').val();
+var scaleVal=$(".scale").find('option:selected').val();
+var sectno=$('.sectioncode').val();//段號
+var number=$('.number').val();//地號
+var print_type=$('input[name=PrintType]:checked').val();//1:直印 0:橫印
+var digitBuild=$("#merge").prop('checked')?'1':'0'; // 圖解區分幅自動接合 1有打溝0沒打溝
+if(city==""){
+	alert("請選擇縣市");
+	return;
+}
+
+if(town==""){
+	alert("請選擇鄉鎮");
+	return;
+}
+
+if(sect==""){
+	alert("請選擇地段");
+	return;
+}
+
+if(sectno=="輸入數值"){
+	alert("請輸入段代碼");
+	return;
+}
+
+if(number==""){
+	alert("請輸入地號");
+	return;
+}
+var data = new Object();
+data.city=city;
+data.town=town;
+data.sectno=sectno;
+data.landbuild=number;
+data.project=project;
+data.MBPart='0';//一開始查帶0，按下確認框帶1
+data.paper_size=paper_size;
+data.scale=scaleVal;
+data.print_type=print_type;
+data.digitBuild=digitBuild;
+toGetCmd(data);		
+}
+
+
+function treeMBQuery(city,town,sectno,number,part,paper_size,scaleVal,print_type,digitBuild,papersStr){//MB樹狀結構反查
+	var data = new Object();
+	data.city=city;
+	data.town=town;
+	data.sectno=sectno;
+	data.landbuild=number;
+	data.project="MB";
+	data.MBPart=part;//一開始查帶0，按下確認框帶1
+	data.paper_size=paper_size;
+	data.scale=scaleVal;
+	data.print_type=print_type;
+	data.digitBuild=digitBuild;
+	data.Sheets=papersStr;//張數
+	toGetCmd(data);	
+	data=null;
+}

@@ -1,0 +1,168 @@
+var show_landno=true;
+var parcel_fill=true;
+var styles = {
+    		'Polygon': [new ol.style.Style({
+    		    stroke: new ol.style.Stroke({
+    		      color: 'red',
+    		      width: 2
+    		    }),
+    		    fill: new ol.style.Fill({
+    		      color: 'rgba(255, 255, 0, 0.1)'
+    		    })//,
+    		    //text: createTextStyle(feature, resolution)
+    		  })]
+ };
+      
+ var styleFunction = function(feature, resolution) {//地籍圖樣式處理
+    	  //return styles[feature.getGeometry().getType()];
+	 var zIndex=2;
+	 var fill = feature.get('color');
+	if(fill=='fill')
+		 zIndex=1;
+	 
+	 return new ol.style.Style({
+         stroke: new ol.style.Stroke({
+           color: 'blue',
+           width: 1
+         }),
+//         fill: new ol.style.Fill({
+//           color: 'rgba(0, 0, 255, 0.1)'
+//         }),
+//		 stroke:createStrokeStyle(feature, resolution),
+         fill: createFillStyle(feature, resolution),
+         text: createTextStyle(feature, resolution),
+         zIndex:zIndex
+       });
+};
+
+
+var gpalsStyleFunction = function(feature, resolution) {//多目標地籍圖樣式處理
+	  //return styles[feature.getGeometry().getType()];
+
+return new ol.style.Style({
+   stroke: new ol.style.Stroke({
+     color: 'red',
+     width: 2
+   }),
+//   fill: createFillStyle(feature, resolution),
+   text: createTextStyle2(feature, resolution)
+ });
+};
+
+
+var styleSectFunction = function(feature, resolution) {
+	  //return styles[feature.getGeometry().getType()];
+
+return new ol.style.Style({
+   stroke: new ol.style.Stroke({
+     color: 'blue',
+     width: 1
+   }),
+//   fill: new ol.style.Fill({
+//     color: 'rgba(0, 0, 255, 0.1)'
+//   }),
+   text: createTextStyle(feature, resolution)
+ });
+};
+
+
+var createStrokeStyle = function(feature, resolution) {
+	
+	var fill = feature.get('color');
+	var style;
+	if((fill=='fill')&&(parcel_fill))
+	{
+		style= new ol.style.Stroke({
+	           color: 'red',
+	           width: 3
+	         });
+	}else{
+		style= new ol.style.Stroke({
+	           color: 'blue',
+	           width: 1
+	         });
+	}
+	return style;
+};
+
+var createFillStyle = function(feature, resolution) {
+	var fill = feature.get('color');
+	var style;
+	if((fill=='fill')&&(parcel_fill))
+	{
+		style= new ol.style.Fill({
+	         color: 'rgba(255, 255, 153, 0.4)'
+	       });
+	}else{
+	   style= new ol.style.Fill({
+         color: 'rgba(0, 0, 255, 0.1)'
+       });
+	}
+	return style;
+};
+
+
+var createTextStyle = function(feature, resolution) {
+    var align = 'center';
+    var baseline = 'middle';
+    var size = '10px';
+    var offsetX = 0;
+    var offsetY = 0;
+    var weight = 'normal';
+    var rotation = 0.0;
+    var font = weight + ' ' + size + ' ' + 'Arial';
+    var fillColor = 'blue';
+    var outlineColor = '#ffffff';
+    var outlineWidth = 3;
+
+    return new ol.style.Text({
+      textAlign: align,
+      textBaseline: baseline,
+      font: font,
+      text: getText(feature, resolution),
+      fill: new ol.style.Fill({color: fillColor}),
+      stroke: new ol.style.Stroke({color: outlineColor, width: outlineWidth}),
+      offsetX: offsetX,
+      offsetY: offsetY,
+      rotation: rotation
+    });
+  };
+  
+  
+  var createTextStyle2 = function(feature, resolution) {
+	    var align = 'center';
+	    var baseline = 'middle';
+	    var size = '10px';
+	    var offsetX = 0;
+	    var offsetY = 0;
+	    var weight = 'normal';
+	    var rotation = 0.0;
+	    var font = weight + ' ' + size + ' ' + 'Arial';
+	    var fillColor = 'red';
+	    var outlineColor = '#ffffff';
+	    var outlineWidth = 3;
+
+	    return new ol.style.Text({
+	      textAlign: align,
+	      textBaseline: baseline,
+	      font: font,
+	      text: getText(feature, resolution),
+	      fill: new ol.style.Fill({color: fillColor}),
+	      stroke: new ol.style.Stroke({color: outlineColor, width: outlineWidth}),
+	      offsetX: offsetX,
+	      offsetY: offsetY,
+	      rotation: rotation
+	    });
+	  };
+  
+  
+  var getText = function(feature, resolution) {
+	  var text;
+	  if(show_landno){
+          text = feature.get('text');
+	  }else{
+		  text ='';
+	  }
+      return text;
+   };
+

@@ -1,0 +1,351 @@
+var click_land;
+var contextmenu;
+
+function addContextMenu(){//加入右鍵選單功能
+	
+	if(contextmenu!=undefined){
+		contextmenu.close();
+	    contextmenu.clear();
+	    try{
+	    map.removeControl(contextmenu);
+	    }catch(e){
+	    }
+	}
+
+	var contextmenu_items = [
+	                         {
+	                           text: '宗地資訊',
+	                           icon: 'images/share/contextMenu/parcel.png',
+	                           callback: getParcelData
+	                         },
+	                         {
+	                           text: '查詢標示部',
+	                           icon: 'images/share/contextMenu/land.png',
+	                           callback: clickQryLand
+	                         },
+	                         {
+		                           text: '查詢經緯度(WGS84)',
+		                           icon: 'images/share/contextMenu/lonlat.png',
+		                           callback: QryLoLa
+		                     }//,
+	                         //'-' // this is a separator
+	                       ];
+	var contextmenu_items2 = [
+	                         {
+	                           text: '查詢標示部',
+	                           icon: 'images/share/contextMenu/land.png',
+	                           callback: clickQryLand
+	                         },
+	                         {
+		                           text: '查詢經緯度(WGS84)',
+		                           icon: 'images/share/contextMenu/lonlat.png',
+		                           callback: QryLoLa
+		                     }//,
+	                         //'-' // this is a separator
+	                       ];
+	
+	
+	var contextmenu_items3 = [
+		                       
+		                         {
+			                           text: '查詢經緯度(WGS84)',
+			                           icon: 'images/share/contextMenu/lonlat.png',
+			                           callback: QryLoLa
+			                     }//,
+		                         //'-' // this is a separator
+		                       ];
+	
+	
+//	if(contextmenu!=undefined){
+//		return;
+//	}
+	  contextmenu = new ContextMenu({
+	                         width: 180,
+	                         default_items: false,
+	                         items: contextmenu_items
+	                       });
+	  
+	  
+	                      
+	                         map.addControl(contextmenu);
+	                      //   map.removeControl(contextmenu);
+		
+	                         click_land=undefined;
+	                         var click_feature=false;
+		contextmenu.on('beforeopen', function(evt){
+
+			  overlay.setPosition(undefined);
+			//click_land=undefined;
+//			var is_open=false;
+			  click_feature=false;
+			  var feature = map.forEachFeatureAtPixel(evt.pixel, function(ft, l){
+				  var att = ft.getProperties();
+				  click_land=att.text;
+				  click_feature=true;
+//				  is_open=true;
+			      //return ft;
+			  });
+			  
+			  contextmenu.enable();
+			       
+//			  if (is_open) { // open only on features
+//				 
+//				  contextmenu.enable();
+//				 
+//			  } else {
+//				  contextmenu.disable();
+//			  }
+			  
+			
+			
+		});
+		
+		
+		
+		
+		 contextmenu.on('open', function(evt){
+			   // alert('選單開啟');
+			// console.log('測試地號:'+click_land);
+			  //依照有無地號判斷出現選項
+			 
+			 //顯示mark
+//			 var mark_point=new ol.geom.Point(evt.coordinate);
+//				locate_mark=getMarker(mark_point,'locate',mark_img1,"(x坐標:"+evt.coordinate.longitude+",y坐標:"+evt.coordinate.latitude+")");
+//				map.addLayer(locate_mark);
+			 //顯示mark
+			 
+			 
+			 
+			  try{
+				  
+			  if(!click_feature){//沒點到地籍圖
+				  
+				  contextmenu.clear();
+				  contextmenu.extend(contextmenu_items3);
+				  
+			  }else if(click_land==undefined){
+				 
+				  contextmenu.clear();
+				  contextmenu.extend(contextmenu_items2);
+			
+			  }else{
+				 
+				  contextmenu.clear();
+				  contextmenu.extend(contextmenu_items);
+		
+			  }
+			  }catch(e){
+					 console.log('e:'+e);
+			  }
+	     });
+		 
+		 
+		 contextmenu.on('close', function(evt){
+			  // it's upon you
+			 //map.removeControl(contextmenu);
+			 //context_btn_ctl=false;
+		
+	     });
+		
+		  
+		 
+}
+
+
+function getParcelData(obj) {//坐標反查地號資訊
+	var point=ol.proj.transform(obj.coordinate, 'EPSG:3857', 'EPSG:4326');
+	var x=point[0];
+	var y=point[1];	
+
+	$.ajax({
+		url: "./Qry_getParcel.action",
+		type: "POST",
+		dataType: "json",
+		error: function(xhr) {
+		hideSendMsg();
+		alert( "查無資料");
+	    },
+		data:{city:DLData.city,town:DLData.town,sectno:DLData.sectno,x:x,y:y,uid:enuid},
+	    beforeSend:function(){
+			showSendMsg('查詢中…');
+		},
+		success: function(data) {
+			 hideSendMsg();
+			 
+			 var zone= '<tr>'+
+			 '<td class="left" width="25%">使用分區</td>'+
+			 '<td class="right" colspan="3">'+data.zone+'</td>'+
+			 '</tr>';
+			 if(data.zone==undefined)
+				 zone=''; 
+			 var type= '<tr>'+
+			 '<td class="left" width="25%">使用編定</td>'+
+			 '<td class="right" colspan="3">'+data.type+'</td>'+
+			 '</tr>';
+			 if(data.type==undefined)
+				 type=''; 
+			 content.innerHTML = 
+			 '<br>'+
+			 '<div class="popup_div" align="center">'+
+			 '<br>'+
+		     '<table border="1" cellpadding="0" cellspacing="0" width="100%" bordercolor="#FFFFFF">'+
+			 '<TH colspan="4">'+
+			 '<center><FONT COLOR="#FFFFFF"><b></b>宗地資訊</FONT></center>'+
+			 '</TH>'+
+			 '<tr>'+
+			 '<td class="left" width="25%">地號</td>'+
+			 '<td class="right" colspan="3">'+data.pn+'</td>'+
+			 '</tr>'+
+			 '<tr>'+
+			 '<td class="left" width="25%">面積</td>'+
+			 '<td class="right" colspan="3">'+data.area+'</td>'+
+			 '</tr>'+
+			 '<tr>'+
+			 '<td class="left" width="25%">公告現值</td>'+
+			 '<td class="right" colspan="3">'+data.price+'</td>'+
+			 '</tr>'+
+			 zone+
+			 type+
+			 '</table>'+
+			 '<br>'+
+			 '</div>'+
+			 '<br>';
+			 overlay.setPosition(obj.coordinate);//點選位置
+//			 var cx= parseFloat(data.cx);
+//			 var cy= parseFloat(data.cy);
+//			 var cen_point=ol.proj.transform([cx, cy], 'EPSG:4326', 'EPSG:3857');
+//			 overlay.setPosition(cen_point);//宗地視中心
+
+			 view.setCenter(obj.coordinate);
+	    }
+	});
+//	
+	
+}
+
+function clickQryLand(obj){
+	
+	
+	
+	var city=DLData.city;
+	var town=DLData.town;
+	var sectno=DLData.sectno;
+	var landno=click_land;
+	var proj='1';
+	
+	//alert(landno);
+	
+	
+	if((landno==undefined)||(landno=="")){//點到沒有地號的地方做處理
+		//alert('無標示地號的地方，無法反查詢標示部');
+		var point=ol.proj.transform(obj.coordinate, 'EPSG:3857', 'EPSG:4326');
+		var x=point[0];
+		var y=point[1];	
+		$.ajax({
+			url: "./Qry_getParcel.action",
+			type: "POST",
+			dataType: "json",
+			error: function(xhr) {
+			hideSendMsg();
+			alert( "查無資料");
+		    },
+			data:{city:city,town:town,sectno:sectno,x:x,y:y,uid:enuid},
+		    beforeSend:function(){
+				showSendMsg('查詢中…');
+			},
+			success: function(data) {
+				treeQuery(city,town,sectno,data.pn,proj,'','');
+			}
+		});
+		return; 
+	}else{
+		treeQuery(city,town,sectno,landno,proj,'','');
+	}
+	//alert("反查"+obj.coordinate);
+	
+	//treeQuery(city,town,sectno,landno,proj,'','');
+
+//	setTimeout(function(){ getTreeRecord(); }, 1000);
+	
+}
+
+function QryLoLa(obj){
+
+	var point=ol.proj.transform(obj.coordinate, 'EPSG:3857', 'EPSG:4326');
+	var WGS84x=point[0];
+	var WGS84y=point[1];
+	
+	var declat=decToDeg(WGS84x);
+	var declon=decToDeg(WGS84y);
+	
+	var g_declat=decToDeg(WGS84x,3);
+	var g_declon=decToDeg(WGS84y,3);
+	
+	
+	
+	var point_google=WGS84x.toFixed(6)+','+WGS84y.toFixed(6);
+	
+	var dec_point_google=g_declat+' '+g_declon;
+	
+	 content.innerHTML = 
+		 '<br>'+
+		 '<div class="popup_div" align="center">'+
+		 '<br>'+
+	     '<table border="1" cellpadding="0" cellspacing="0" width="100%" bordercolor="#FFFFFF" sytle="border-radius: 10px;">'+
+//		 '<TH colspan="4">'+
+//		 '<center><FONT COLOR="#FFFFFF"><b></b>經緯度轉換</FONT></center>'+
+//		 '</TH>'+
+//		 '<tr>'+
+//		 '<td class="left" width="25%">東經</td>'+
+//		 '<td class="right" colspan="3">'+declat+'秒</td>'+
+//		 '</tr>'+
+//		 '<tr>'+
+//		 '<td class="left" width="25%">北緯</td>'+
+//		 '<td class="right" colspan="3">'+declon+'秒</td>'+
+//		 '</tr>'+
+//		 '<tr>'+
+//		 '<td class="left" width="25%">東經</td>'+
+//		 '<td class="right" colspan="3">'+WGS84x+'度</td>'+
+//		 '</tr>'+
+//		 '<tr>'+
+//		 '<td class="left" width="25%">北緯</td>'+
+//		 '<td class="right" colspan="3">'+WGS84y+'度</td>'+
+//		 '</tr>'+
+//		 '</table>'+
+//		 '<table border="1" cellpadding="0" cellspacing="0" width="100%" bordercolor="#FFFFFF" sytle="border-radius: 10px;">'+
+//		 '<TH colspan="4">'+
+//		 '<center><FONT COLOR="#FFFFFF"><b></b>經緯度(google)</FONT></center>'+
+//		 '</TH>'+
+//		 '<tr>'+
+//		 '<td class="left" width="25%">經緯度</td>'+
+//		 '<td class="right" colspan="3">'+point_google+'(度)</td>'+
+//		 '</tr>'+
+//		 '<tr>'+
+//		 '<td class="left" width="25%">經緯度</td>'+
+//		 '<td class="right" colspan="3">'+dec_point_google+'(度分秒)</td>'+
+//		 '</tr>'+
+		 '<TH colspan="4">'+
+		 '<center><FONT COLOR="#FFFFFF"><b></b>經緯度資訊</FONT></center>'+
+		 '</TH>'+
+		 '<tr>'+
+		 '<td class="left" width="25%">經度</td>'+
+		 '<td class="right">'+WGS84x.toFixed(6)+'</td>'+
+		 '<td class="left" width="25%">緯度</td>'+
+		 '<td class="right">'+WGS84y.toFixed(6)+'</td>'+
+		 '</tr>'+
+		 '<td class="left" width="25%">經緯度</td>'+
+		 '<td class="right" colspan="3">'+point_google.split(',')[1]+','+point_google.split(',')[0]+'</td>'+
+		 '</tr>'+
+		 '<tr>'+
+		 '<tr>'+
+		 '<td colspan="4" style="border-bottom-width: 1px;border-bottom-style: solid;border-bottom-color: #D5D5D5;"><font color="red">「本經緯度資料僅供參考(免費)， 實地界址以複丈鑑界結果為準， 因GPS訊號本身的誤差， 以及坐標系統轉換計算的誤差， 都可能影響資料的精確度。」</font></td>'+
+		 '</tr>'+
+		 '</table>'+
+		 
+		 '<br>'+
+		 '</div>'+
+		 '<br>'
+		 ;
+	overlay.setPosition(obj.coordinate);
+	view.setCenter(obj.coordinate);
+}

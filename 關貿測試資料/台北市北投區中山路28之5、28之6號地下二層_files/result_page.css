@@ -1,0 +1,72 @@
+.left
+{
+	font-size: 100%;
+	color:#4B6400;
+	background: #ECF0D2;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+	border-bottom-color: #D5D5D5;
+}
+.right
+{
+	font-size: 100%;
+	color:#666;
+	background: #F2F2F2;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+	border-bottom-color: #D5D5D5;
+	border-left-width: 1px;
+	border-left-style: solid;
+	border-left-color: #D5D5D5;
+}
+.right2
+{
+	font-family:º–∑¢≈È;
+	font-size: 100%;
+	color:black;
+	background: #F2F2F2;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+	border-bottom-color: #D5D5D5;
+	border-left-width: 1px;
+	border-left-style: solid;
+	border-left-color: #D5D5D5;
+}
+TH
+{
+	font-size: 100%;
+	background: #ABBE41;
+}
+
+.address_title
+{
+	background:#ABBE41;
+	text-align: center ;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+	border-bottom-color: #D5D5D5;
+}
+.bar
+{
+	border-bottom-width: 2px;
+	border-bottom-style: solid;
+	border-bottom-color: #FFF;
+	 background: #D8E0A5;
+	border-top-width: 2px;
+	border-top-style: solid;
+	border-top-color: #FFF;
+}
+#title
+{
+	 font-color : #123456 ; 
+	 text-align : center ; 
+	 font-size : medium;
+}
+
+.sub_div{
+    float:left;
+	width: 100px;
+	border: 1px solid red;
+	text-align: center;
+	cursor: pointer;
+}

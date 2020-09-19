@@ -1,0 +1,50 @@
+#newspaper-a
+{
+	font-family: Arial, "微軟正黑體";
+	width: 99%;
+	text-align: left;
+	border-collapse: collapse;
+	border: 1px solid #EBBCA3;
+	font-weight: normal;
+	margin-top: 10px;
+	margin-bottom: 10px;
+}
+#newspaper-a th
+{
+	font-weight: bold;
+	color: #83411D;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+	border-bottom-color: #EBBCA3;
+	background-color: #F8E7DE;
+	border-right-width: 1px;
+	border-right-style: solid;
+	border-right-color: #EBBCA3;
+	text-align: center;
+	font-size: 1em;
+	padding-top: 5px;
+	padding-right: 3px;
+	padding-bottom: 5px;
+	padding-left: 3px;
+	width: 20%;
+}
+#newspaper-a td
+{
+	color: #3D1F1F;
+	text-align: left;
+	border-right-width: 1px;
+	border-bottom-width: 1px;
+	border-left-width: 1px;
+	border-right-style: solid;
+	border-bottom-style: solid;
+	border-left-style: solid;
+	border-right-color: #EBBCA3;
+	border-bottom-color: #EBBCA3;
+	border-left-color: #EBBCA3;
+	padding-top: 5px;
+	padding-right: 3px;
+	padding-bottom: 5px;
+	padding-left: 3px;
+	font-size: 1em;
+	font-weight: normal;
+}

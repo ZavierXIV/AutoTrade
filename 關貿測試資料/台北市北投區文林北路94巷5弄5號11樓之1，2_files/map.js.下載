@@ -1,0 +1,473 @@
+//var taitwan = ol.proj.fromLonLat([120.9833596217104,24.786544964740116]);
+var taitwan = ol.proj.fromLonLat([120.979901,23.974095]);
+var view;
+var map;
+var extent;
+var projection;
+var measure_ctl;//測量
+var showLand_ctl;//圖層
+var showLand_ctl2;//圖層(homeMap)
+var zoom_ctl;//全視景
+var zoom_ctl2;//全視景(建物成果圖)
+//var pdf_ctl;//pdf
+var scal_ctl;//比例尺
+var dxf_ctl;//存dxf
+var dxf_ctl2;//存dxf
+var img_ctl;//存成果圖
+var sect_ctl;//全段全幅
+var rent_ctl;//框選放大
+var rent_ctl2;//框選放大(homeMap)
+var area_ctl;//測量面積
+//var kml_ctl;//kml,shape上傳
+//var edoc_ctl;//騰本
+var g158_ctl;//樂活
+var gps_ctl;//gps
+var gps_ctl2;//(homeMap)
+var taobao_ctl;//桃寶
+var lonlat_clt;//經緯度查詢
+var address_clt;//門牌定位
+var cleanExt_clt;//清除圖層
+//var point_clt;//坐標定位
+var DLData;//要下載地籍圖dxf及建物成果品圖的參數變數
+var selectInteraction;
+var dragBoxInteraction;
+var projection = ol.proj.get('EPSG:3857');
+var projectionExtent = projection.getExtent();
+var project_size = ol.extent.getWidth(projectionExtent) / 256;
+var osm;
+var nlsc;
+var TGOS;
+var city_map;
+var town_map;
+var sect_map;
+var village_map;
+var photo2_map;
+var extend_kml;
+var locate_mark;//定位地標
+var rec_x;//查詢資料返回地圖模式要顯示的x坐標
+var rec_y;//查詢資料返回地圖模式要顯示的Y坐標
+var old_serverUrl = "http://maps.nlsc.gov.tw/S_Maps/wmts";
+var serverUrl = "https://wmts.nlsc.gov.tw/wmts";
+var rec_extend;//記錄地圖範圍
+function initMap(){
+	
+	
+	  nlsc=loadWmts(serverUrl,'EMAP');
+	  city_map=loadWmts(serverUrl,'CITY');
+	  town_map=loadWmts(serverUrl,'TOWN');
+	  sect_map=loadWmts(serverUrl,'LANDSECT');
+	  village_map=loadWmts(serverUrl,'Village');
+	 // photo2_map=loadWmts(old_serverUrl,'PHOTO2');
+	  photo2_map=loadWmts(serverUrl,'PHOTO2');
+	 
+	  view = new ol.View({center: taitwan,zoom: 15});
+	  map = new ol.Map({
+		  controls: ol.control.defaults({
+	          attributionOptions: /** @type {olx.control.AttributionOptions} */ ({
+	            collapsible: false
+	          })
+	        }).extend([
+//	          new app.RotateNorthControl(),
+//	          new app.ShowLandnoControl(),
+//	          scaleLineControl
+	        ]),
+	        interactions : ol.interaction.defaults({doubleClickZoom :false}),
+//	        layers: [nlsc],//EPSG:3857
+	        view: view
+	      });
+	
+	
+	 // $.when(nlsc).done(function(){
+		  setBaseLayer(nlsc);
+		  
+		
+		 //});
+		  
+		  nlsc.on('tileloadend', function() {alert('載入完成');});
+	  
+
+	  
+	  map.addLayer(vector);//加入測量線圖層
+	  measure_ctl=new app.RotateNorthControl({buttonTipLabel: "點選後，在地籍圖上可以連續左鍵點選取得距離長度，按左鍵二下結束。視景變化後清除量測線段"});
+	  showLand_ctl=new app.ShowLandnoControl({buttonTipLabel: "可開關圖層",className: "show-landno",customClass:"custom_btn"});
+	  showLand_ctl2=new app.ShowLandnoControl({buttonTipLabel: "可開關圖層",className: "show-landno2",customClass:"custom_btn4"});
+	  zoom_ctl= new app.zoomExtendControl({buttonTipLabel: "全視景",action:"L"});
+	  zoom_ctl2= new app.zoomExtendControl({buttonTipLabel: "全視景",action:"B"});
+	  scal_ctl = new ol.control.ScaleLine();
+	  //pdf_ctl=new app.GetPDFControl();
+	  dxf_ctl=new app.SaveDXFControl({buttonTipLabel: "可框選視景儲存成影像以新視窗開啟。或儲存單筆宗地DXF檔",className: "saveDxf",action:"L"});
+	  dxf_ctl2=new app.SaveDXFControl({buttonTipLabel: "查詢建物測量成果圖時將建物測量成果圖儲存影像檔後以瀏覽器開啟",className: "saveImage",action:"B"});
+	  img_ctl=new app.SaveImgControl();
+	  sect_ctl=new app.AllSectControl({buttonTipLabel: "點選後，會自動下載目前已開啟地籍圖所在的全段(幅)地籍圖"});
+	  rent_ctl=new app.RentSelectControl({buttonTipLabel: "框選二角點放大視景",className: "RentSelect",customClass:"custom_btn"});
+	  rent_ctl2=new app.RentSelectControl({buttonTipLabel: "框選二角點放大視景",className: "RentSelect2",customClass:"custom_btn4"});
+	  area_ctl=new app.AreaControl({buttonTipLabel: "點選後，在地籍圖上可以連續左鍵點選取得距離長度，按左鍵二下結束。視景變化後清除量測線段"});
+//	  kml_ctl=new app.kmlControl({buttonTipLabel: "將自有的SHP/KML套疊至圖形圖"});
+//	  edoc_ctl=new app.EdocControl({buttonTipLabel: "申請電子謄本"});
+	  g158_ctl=new app.G158Control({buttonTipLabel: "將地籍圖套疊於台中市樂活網(僅台中市出現)"});
+	  taobao_ctl=new app.TaoBaoControl({buttonTipLabel: "將地籍圖套疊於桃園市桃寶網(僅桃園市出現)"});
+	  gps_ctl=new app.gpsControl({buttonTipLabel: "用HTML5抓目前所在位置",className: "gps",customClass:"custom_btn"});
+	  gps_ctl2=new app.gpsControl({buttonTipLabel: "用HTML5抓目前所在位置",className: "gps2",customClass:"custom_btn4"});
+	  lonlat_clt=new app.lonLatControl({buttonTipLabel: "經緯度查詢"});
+	 //address_clt=new app.addressControl({buttonTipLabel: "門牌定位"});
+	  address_clt=new app.addressControl({buttonTipLabel: "定位查詢"});
+	  cleanExt_clt=new app.cleanMapExtend({buttonTipLabel: "清除額外圖層"});
+//	  point_clt=new app.pointGPSControl({buttonTipLabel: "坐標定位"});
+	  
+	   selectInteraction = new ol.interaction.Select({
+          condition: ol.events.condition.never
+      });
+       dragBoxInteraction = new ol.interaction.DragBox({
+//          style: new ol.style.Style({
+//              stroke: new ol.style.Stroke({
+//                  color: [250, 25, 25, 1]
+//              })
+//          })
+      });
+      
+      dragBoxInteraction.on('boxend', function(event) {
+    	  try{
+    	  var extent = dragBoxInteraction.getGeometry().getExtent();
+    	  map.getView().fit(extent,map.getSize());
+    	  map.removeInteraction(dragBoxInteraction);
+    	  setMapCursor("");
+    	  }catch(e){
+    	  }
+      });
+      
+//      map.on("moveend", function (e) {
+//    	    console.log("moved");
+//      });
+      
+      
+      document.body.addEventListener('mousedown', function (e){
+    	    
+    	   if(e.button === 2){//滑鼠按右錄
+    		   //map.un("contextmenu");
+//    		   console.log("right click1!");
+    		   if(drawing){
+    		   ol.Observable.unByKey(listener);
+ 	           map.un("pointermove");
+ 	           map.removeInteraction(draw);
+ 	           drawing=false;
+ 	          measureTooltip.setPosition(undefined);
+    		   }
+    		   //e.stopPropagation()
+    	    }
+    	   
+    	}, false);
+      
+      
+      
+      map.on('moveend',function(e){
+ 
+    	  rec_extend=map.getView().calculateExtent(map.getSize());
+         //console.log(rec_extend);
+      });
+
+
+    
+}
+
+var container;
+var content;
+var closer;
+var overlay;
+function initPoup(){
+	  container = document.getElementById('popup');
+      content = document.getElementById('popup-content');
+      closer = document.getElementById('popup-closer');
+
+
+     /**
+      * Create an overlay to anchor the popup to the map.
+      */
+      overlay = new ol.Overlay(/** @type {olx.OverlayOptions} */ ({
+       element: container,
+       autoPan: true,
+       autoPanAnimation: {
+         duration: 250
+       }
+     }));
+     
+     /**
+      * Add a click handler to hide the popup.
+      * @return {boolean} Don't follow the href.
+      */
+     closer.onclick = function() {
+       overlay.setPosition(undefined);
+       closer.blur();
+       return false;
+     };
+
+     map.addOverlay(overlay);
+}
+
+
+function transform(extent) {
+    return ol.proj.transformExtent(extent, 'EPSG:3857', 'EPSG:4326');
+  }
+
+
+
+function extentVectorView(ol_map,vlayer,vsource){
+	vlayer.addEventListener("change", function () {
+		toZoomExtend(ol_map,vsource);
+	});
+}
+
+function toZoomExtend(ol_map,vsource){
+	ol_map.getView().fit(vsource.getExtent(), ol_map.getSize());
+}
+
+function initMapView(){//初始化地圖視點
+	view = new ol.View({center: taitwan,zoom: 15});
+	map.setTarget('map');
+	map.setView(view);
+}
+
+
+function initImageView(){//初始化地圖視點圖片
+	// extent = [0, 0, 1024, 968];
+	extent = [0, 0,600, 330];
+	 projection = new ol.proj.Projection({
+	  code: 'xkcd-image',
+	  units: 'pixels',
+	  extent: extent
+	});
+	view =new ol.View({
+	    projection: projection,
+	    center: ol.extent.getCenter(extent),
+	    zoom: 2
+	  });
+}
+
+function pointPan(point){
+	var pan = ol.animation.pan({
+        duration: 2000,
+        source: /** @type {ol.Coordinate} */ (view.getCenter())
+      });
+      map.beforeRender(pan);
+      view.setCenter(point);
+}
+
+function pointFly(point){
+	  var duration = 2000;
+      var start = +new Date();
+      var pan = ol.animation.pan({
+        duration: duration,
+        source: /** @type {ol.Coordinate} */ (view.getCenter()),
+        start: start
+      });
+      var bounce = ol.animation.bounce({
+        duration: duration,
+        resolution: 4 * view.getResolution(),
+        start: start
+      });
+      map.beforeRender(pan, bounce);
+      view.setCenter(point);
+}
+
+function getMapScale(){
+		    var view = map.getView(); ;
+		    var resolution = view.getResolution();
+		    var units = map.getView().getProjection().getUnits();
+		    var dpi = 25.4 / 0.28;
+		    var mpu = ol.proj.METERS_PER_UNIT[units];
+		    var scale = resolution * mpu * 39.37 * dpi;
+		    return scale;
+}
+
+
+function getMapResolution(scale){
+	
+//	var units = view.getProjection().getUnits();
+//    var dpi = 25.4 / 0.28;
+//    var mpu = ol.proj.METERS_PER_UNIT[units];
+//    var resolution = scale / mpu / 39.37 / dpi;
+//    return resolution;
+	
+	var units = map.getView().getProjection().getUnits();
+    var dpi = 25.4 / 0.28;
+    var mpu = ol.proj.METERS_PER_UNIT[units];
+    var resolution = scale/(mpu * 39.37 * dpi);
+    return resolution;
+
+}
+
+
+function viewToScale(scale){
+    //var resolution = getMapResolution(scale);
+	var units = view.getProjection().getUnits();
+    var dpi = 25.4 / 0.28;
+    var mpu = ol.proj.METERS_PER_UNIT[units];
+    var resolution = scale / mpu / 39.37 / dpi;
+    view.setResolution(resolution);
+}
+
+
+function setBaseLayer(base_layer){
+	var layers = map.getLayers();
+	layers.insertAt(0, base_layer);
+}
+
+
+function loadWmts(serverUrl,layer){
+	 //var serverUrl = "http://maps.nlsc.gov.tw/S_Maps/wmts";
+//	 var serverUrl = "http://wmts.nlsc.gov.tw/wmts";
+	 var resolutions = new Array(21);
+	 var matrixIds = new Array(21);
+	    for (var i=0; i<21; ++i) {
+	    	 resolutions[i] = project_size / Math.pow(2, i);
+	        matrixIds[i] = "EPSG:3857:" + (i);
+	    }
+
+	  var wmts =  new ol.layer.Tile({
+	     // opacity: 0.7,
+	      extent: projectionExtent,
+	      source: new ol.source.WMTS({
+	    	  crossOrigin:'anonymous',
+	        url: serverUrl,
+	        layer: layer,
+	        matrixSet: 'EPSG:3857',
+	        format: 'image/png',
+	        projection: projection,
+	        tileGrid: new ol.tilegrid.WMTS({
+	          origin: ol.extent.getTopLeft(projectionExtent),
+	          resolutions: resolutions,
+	          matrixIds: matrixIds
+	        }),
+	       
+	        style: 'default'//,
+//	        tileLoadFunction:customLoader
+	        	 //,crossOrigin: 'Anonymous'
+	        	//,crossOrigin: null
+	      })
+	    });
+	  
+	  return wmts;
+}
+
+//function customLoader(tile, src) {
+////	  var client = new XMLHttpRequest();
+////	  client.open('GET', src);
+////	  client.setRequestHeader('foo', 'bar');
+////	  client.onload(function() {
+////	    var data = 'data:image/png;base64,' + btoa(unescape(encodeURIComponent(this.responseText)));
+////	    tile.getImage().src = data;
+////	  });
+////	  client.send();
+//	var xhr = new XMLHttpRequest();
+//	xhr.open("GET", src);
+//	xhr.responseType = "arraybuffer";
+//
+//	xhr.onload = function () {
+//	    var arrayBufferView = new Uint8Array(this.response);
+//	    var blob = new Blob([arrayBufferView], { type: 'image/png' });
+//	    var urlCreator = window.URL || window.webkitURL;
+//	    var imageUrl = urlCreator.createObjectURL(blob);
+//	    tile.getImage().src = imageUrl;
+//	};
+//	xhr.send();
+//	}
+
+//function loadTgosWmts(){
+//	  var wmts;
+//	  var parser = new ol.format.WMTSCapabilities();
+//	fetch('WMTS/TGOSCapabilities.xml').then(function(response) {
+//        return response.text();
+//      }).then(function(text) {
+//        var result = parser.read(text);
+//        var options = ol.source.WMTS.optionsFromCapabilities(result,
+//            {layer: 'Map', matrixSet: 'EPSG:3857'});
+//          wmts =  new ol.layer.Tile({
+//  	      extent: projectionExtent,
+//  	      source: new ol.source.WMTS(options)
+//          });
+//          return wmts;
+//      });
+//
+//}
+
+var loadTgosLayer= function(){
+	
+	var _dfr = new $.Deferred();
+	var parser = new ol.format.WMTSCapabilities();
+	fetch('WMTS/TGOSCapabilities.xml').then(function(response) {
+		return response.text();
+	}).then(function(text){
+		var result = parser.read(text);
+		var options = ol.source.WMTS.optionsFromCapabilities(result,
+				{layer: 'Map', matrixSet: 'TGOSMAP_W.cfg'});
+		TGOS=new ol.layer.Tile({
+			title : "TGOS電子地圖" ,
+			opacity: 1, 
+			type : "base" ,
+			visible: true,
+			source: new ol.source.WMTS(options)
+		});
+	}).then(function(){
+		_dfr.resolve("TGOS loaded");
+	});
+	return _dfr.promise();
+} ;
+
+
+function initMapViewByID(id){//初始化地圖視點
+	view = new ol.View({center: taitwan,zoom: 11});
+	map.setTarget(id);
+	map.setView(view);
+}
+
+function getMarker(point,layer,image_src,point_text){
+	
+	      var iconFeature = new ol.Feature({
+	        //geometry: new ol.geom.Point([0, 0]),
+	    	geometry: point,
+	        name: layer,
+	        population: 4000,
+	        rainfall: 500
+	      });
+
+	      var iconStyle = [
+	                   new ol.style.Style({
+	                       image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
+	                           anchor: [0.5, 1],
+	                           anchorXUnits: 'fraction',
+	                           anchorYUnits: 'pixels',
+	                           src: image_src
+	                       }))
+	                   }),
+	                   new ol.style.Style({
+	                       text: new ol.style.Text({
+	                           text: point_text,
+	                           offsetY: 55,
+	                           fill: new ol.style.Fill({
+	                               color: '#0000FF'
+	                           })
+	                       })
+	                   })
+	               ];
+
+	      iconFeature.setStyle(iconStyle);
+
+	      var vectorSource = new ol.source.Vector({
+	        features: [iconFeature]
+	      });
+
+	      var vectorLayer = new ol.layer.Vector({
+	        source: vectorSource
+	      });
+	      
+	      return vectorLayer;
+
+}
+
+
+function setMapCursor(type){
+	 var target = map.getTarget();
+	 var jTarget = typeof target === "string" ? $("#"+target) : $(target);
+	 jTarget.css("cursor",type);
+}
+
+

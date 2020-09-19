@@ -1,0 +1,205 @@
+ .gps{
+        top: 5px;
+        right:10px;
+        background-image: url("../../images/tradevan/mapBtn/locate.png");   
+ } 
+ 
+ .gps2{
+        top: 5px;
+        right:10px;
+        background-image: url("../../images/tradevan/mapBtn/locate2.png");   
+ } 
+ 
+
+ .show-landno {
+       top: 5px;
+       right:48px;
+       background-image: url("../../images/tradevan/mapBtn/layer.png");
+        
+      } 
+      
+ .show-landno2 {
+       top: 5px;
+       right:60px;
+       background-image: url("../../images/tradevan/mapBtn/layer2.png");
+        
+      }      
+      
+ 
+ 
+ .RentSelect2{
+        top: 5px;
+        right:110px;
+        background-image: url("../../images/tradevan/mapBtn/zoomin2.png");   
+ } 
+      
+      
+
+
+ .saveDxf{
+        top: 5px;
+        right:86px;
+        background-image: url("../../images/tradevan/mapBtn/save_file.png");
+ } 
+ 
+ 
+ 
+    /*.Kml{
+        top: 5px;
+        right:124px;
+        background-image: url("../../images/tradevan/mapBtn/whole.png");   
+ } */
+ 
+ 
+ 
+  .Area{
+        top: 5px;
+        right:124px;
+        background-image: url("../../images/tradevan/mapBtn/area.png");   
+ } 
+ 
+ 
+ .rotate-north {
+    /*position:absolute;*/
+          right:162px;
+          top: 5px;
+          background-image: url("../../images/tradevan/mapBtn/distance.png");
+      }
+      
+  .allSect{
+        top: 5px;
+        right:200px;
+        background-image: url("../../images/tradevan/mapBtn/translation.png");
+ } 
+ 
+ 
+ /*.Edoc{
+        top: 5px;
+        right:352px;
+        background-image: url("../images/mapBtn/transcript.png");   
+ }*/ 
+ 
+ 
+ .G158{
+        top: 5px;
+        right:238px;
+        background-image: url("../../images/tradevan/mapBtn/158gis.png");   
+ } 
+ 
+  .TaoBao{
+        top: 5px;
+         right:238px;
+        /*right:418px;*/
+         /*margin-right:10px;*/
+        background-image: url("../../images/tradevan/mapBtn/taobao.png");   
+ } 
+ 
+ .RentSelect{
+        top: 75px;
+        left:10px;
+        background-image: url("../../images/tradevan/mapBtn/zoomin.png");   
+ } 
+ 
+ .zoomExtend {
+        top: 115px;
+        left:10px; 
+        background-image: url("../../images/tradevan/mapBtn/zoomExtend.png");
+}
+
+.cleanExtend {
+        top: 155px;
+        left:10px; 
+        background-image: url("../../images/tradevan/mapBtn/cleanExtend.png");
+}
+ 
+ 
+    
+ .get-PDF {
+        top: 5px;
+        right: 5px;
+  }
+  
+ .saveImage{
+        top: 5px;
+        right:10px;
+        background-image: url("../../images/tradevan/mapBtn/save_file.png");
+ }      
+  
+ 
+ /*.ol-touch .rotate-north {
+        top: 80px;
+ }*/
+ 
+ /*ด๚ธี*/
+ 
+  .gps_set{
+        top: 5px;
+        right:160px;
+        background-image: url("../../images/tradevan/mapBtn/gps.png");   
+ } 
+ 
+ .address{
+        top: 5px;
+        right:215px;
+        background-image: url("../../images/tradevan/mapBtn/addresslocate.png");   
+ } 
+ 
+ 
+ .coordinate{
+        top: 5px;
+        right:245px;
+        background-image: url("../../images/tradevan/mapBtn/coordinate.png");   
+ } 
+ 
+ 
+
+ 
+ 
+ custom_btn{
+  
+ display:block;
+  /*margin:1px;*/
+  /*padding:2px;*/
+ /*padding-right:4px;
+ padding-left:4px;/*
+ color:#fff;
+   /*font-size:1.14em;
+ font-weight:700;
+ text-decoration:none;
+ text-align:center;*/
+ height:24px;
+ width:24px;
+ /*line-height:.4em;*/
+ /*background-color:rgba(0,60,136,.5);*/
+ /*border:none;*/
+ /*border-radius:2px;*/
+ cursor: pointer;
+ }
+ 
+ 
+ custom_btn2{
+ display:block;
+ height:24px;
+ width:38px;
+ cursor: pointer;
+ }
+ 
+ 
+ custom_btn3{
+ display:block;
+ height:24px;
+ width:68px;
+ cursor: pointer;
+ }
+ 
+  custom_btn4{
+ display:block;
+ height:35px;
+ width:35px;
+ cursor: pointer;
+ }
+ 
+ 
+ custom_btn:hover {
+	 /*background-color:rgba(0,60,136,.7);*/
+}

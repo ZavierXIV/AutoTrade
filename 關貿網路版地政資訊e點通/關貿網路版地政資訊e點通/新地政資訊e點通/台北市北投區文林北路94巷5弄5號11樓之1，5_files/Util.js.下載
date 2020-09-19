@@ -1,0 +1,1834 @@
+
+function switchImg(id,src){
+	//alert('測試');
+	$(id).attr('src',src);	
+}
+
+function link(url, target){
+	$.ajax({
+		type: "POST",
+		url: url,
+		beforeSend:function(){
+		//$("#div_body").mask("載入中...");
+		},
+		error: function(xhr) {
+	       alert('載入頁面失敗');
+	      // $("#div_body").unmask();
+	    },
+		success: function(response) {
+	    	
+			$(target).html(response);
+			//$("#div_body").unmask();
+		}
+	});
+}
+
+function loadPage(url, target){
+	$.ajax({
+		type: "POST",
+		url: url,
+		beforeSend:function(){
+		$(target).html('');
+		},
+		error: function(xhr) {
+	       alert('載入頁面失敗');
+	    
+	    },
+		success: function(response) {
+	    	
+			$(target).html(response);
+			
+		}
+	});
+}
+
+
+function chkLandNumber(number){
+	try
+	{
+		number =parseLandNo8(number);
+		if(number.length>8)
+		return false;	
+	    return true;
+	
+	}
+	catch(err)
+	{
+	 return false;
+	}
+}
+
+
+function chkBuildNumber(number){
+	try
+	{
+		number =parseBuildNo8(number);
+		if(number.length>8)
+		return false;	
+		return true;
+	
+	}
+	catch(err)
+	{
+	 alert(err);	
+	 return false;
+	}
+	
+}
+
+
+function parseLandNo8(landno){//地號轉八碼
+	var n = landno.indexOf("-");
+	var mno;
+	var cno;
+	if ( n > 0 ) {
+		mno = landno.substring(0,n);
+		cno = landno.substring( n+1);
+		mno = addZero(4,mno);
+		cno = addZero(4,cno);
+	} else {
+		mno = landno;
+		mno = addZero(4,mno);
+		cno = "0000";
+	}
+	return mno+cno;
+}
+
+function parseBuildNo8(bulidno){//建號轉八碼
+	var n = bulidno.indexOf("-");
+	var mno;
+	var cno;
+	if ( n > 0 ) {
+		mno = bulidno.substring(0,n);
+		cno = bulidno.substring( n+1);
+		mno = addZero(5,mno);
+		cno = addZero(3,cno);
+	} else {
+		
+		mno = bulidno;
+		mno = addZero(5,mno);
+		cno = "000";
+	}
+	return mno+cno;
+}
+
+function parseBuildNoBrief(build){//建號八碼轉簡碼
+	var mno=build.substring(0, 5);//取母號
+	var sno=build.substring(5);//取子號
+	var m_mno=fromatIntString(mno);
+	var m_sno=fromatIntString(sno);	
+	if(m_sno==0)
+	{
+		build=m_mno;
+	}
+	else
+	{
+		build=m_mno+"-"+m_sno;
+	}
+	return build;
+}
+
+
+function parseLandNoBrief(land){//地號八碼轉簡碼
+	var mno=land.substring(0, 4);//取母號
+	var sno=land.substring(4);//取子號
+	var m_mno=fromatIntString(mno);
+	var m_sno=fromatIntString(sno);	
+	if(m_sno==0)
+	{
+		land=m_mno;
+	}
+	else
+	{
+		land=m_mno+"-"+m_sno;
+	}
+	return land;
+}
+
+function addZero(size,s)
+{
+   var temp = "";
+   if (s.length < size) 
+   {
+       for (var i = 0; i < size - s.length; i++) {
+       temp += "0";
+       }
+       temp += s;
+   } else {
+    temp = s;
+   }
+    return temp;
+}
+
+function fromatIntString(s){
+	try{
+		return parseInt(s,10);
+	}catch(err){
+		return s;
+	}
+}
+
+function catchOffice(section){ 
+	if(section != ""){
+		return $("#"+section).find('option:selected').val().split("_")[0];
+	}
+	
+}
+
+function showSendMsg(msg){
+	 $.blockUI({ 
+		message: $("<h4 style='text-align:center'><img src='images/share/loading_2.gif' /> <br/>"+msg+"</h4>"), 
+		css: { 
+			top:  ($(window).height()) /2 + 'px', 
+			left: ($(window).width()) /2 + 'px', 
+			width: 'auto',
+			color: '#F00000',
+			background: 'none',
+			border:'0px',
+			opacity: .7
+		},
+		overlayCSS:  { 
+			backgroundColor: 'rgb(236, 236, 236)', 
+			opacity:         0.4, 
+			cursor:          'wait' 
+		} 				 
+    }); 
+}
+
+function hideSendMsg(){
+	$.unblockUI();
+}
+
+
+function showSendMsgDiv(div,msg){
+	$(div).html("<table width='100%' height='100%'><tr><td><h4 style='text-align:center'><img src='images/share/loading_2.gif' /> <br/>"+msg+"</h4></td></tr><table>");
+}
+
+
+function hideSendMsgDiv(div){
+	$(div).html("");
+}
+
+
+function addClass(div,class_name){
+	$(div).addClass( class_name );
+}
+
+
+function cleanAllClass(div,class_name){
+	$(div+" li" ).each(function( index ) {
+		 $( this ).removeClass( class_name);
+	});
+		
+}
+
+function removeClass(div,class_name){
+	$( div ).removeClass(class_name );
+}
+
+function headBtnClick(id){//主選單按鈕
+	$("#hlink"+id+" a").click();
+}
+
+
+function fromAjaxLoad(url,defult_text,data,target){
+	$.ajax({
+		type: "POST",
+		url: url,
+		dataType : "json",
+		data:data,
+		error: function(xhr) {
+			alert("資料讀取失敗");
+			$(target).empty();
+			$(target).append($("<option></option>").attr("value","").text(defult_text));
+	    },
+	    beforeSend:function(){
+			$(target).empty();
+			$(target).append($("<option></option>").attr("value","").text("讀取中..."));
+		},
+		success: function(datas) {
+			$(target).empty();
+			$(target).append($("<option></option>").attr("value","").text(defult_text));
+			
+			
+			$.each(datas, function(i, m) {
+				$(target).append($("<option></option>").attr("value",m.value).text(m.text)); 
+			});
+
+		}
+	});
+}
+
+
+function cleanSelect(deftext,target){
+	$(target).empty();
+	$(target).append($("<option></option>").attr("value","").text(deftext)); 
+	
+}
+
+
+function cleanCity(){
+	cleanSelect('請選擇地段','.section');
+	$('.sectioncode').val('');
+	$('#number').val('');
+	s_town='';
+	s_sectno='';
+	rec_landno='';
+}
+
+function cleanTown(){
+	$('.sectioncode').val('');
+	s_sectno='';
+}
+
+function cleanRoadCity(){
+	cleanSelect('請選擇路名','#road');
+	cleanSelect('巷','.tunnel_doorname');
+	cleanSelect('弄','.alley_doorname');
+	$('#keyin').val('');
+	$('#no').val('');
+	$('#floor').val('');
+	s_town='';
+}
+
+function cleanRoadTown(){
+	cleanSelect('巷','.tunnel_doorname');
+	cleanSelect('弄','.alley_doorname');
+	$('#keyin').val('');
+	$('#no').val('');
+	$('#floor').val('');
+	s_road='';
+}
+
+
+
+function chProj(proj){//
+		
+	var select_id=$("#menu_btn li.active").attr('id');
+	
+	var select_color="#F3FCEB";
+	if(sys_type=='tradevan')
+		 select_color="#FFF7EE";
+
+	if(proj=='L')
+	{
+		
+//alert("###test:"+$("#projectL :selected").val());
+		ch_proj($("#projectL").find('option:selected').val());
+//		ch_proj($("#projectL").find('option:selected').val());
+		$("#projectL").attr('disabled', false);
+		$("#projectB").attr('disabled', true);
+		$( "#projectL" ).css( "background-color", select_color);
+		$( "#projectB" ).css( "background-color", "#DDDDDD");
+		$('#LB_text').text('地號');
+	}else{
+		
+
+		ch_proj($("#projectB").find('option:selected').val());
+		$("#projectL").attr('disabled', true);
+		$("#projectB").attr('disabled', false);
+		$( "#projectL" ).css( "background-color", "#DDDDDD");
+		$( "#projectB" ).css( "background-color", select_color);
+		$('#LB_text').text('建號');
+		
+	}
+	
+
+	
+}
+
+function ch_cltype(type){
+	if(type=='1'){
+		rec_qry_cl='1';
+		$("#regid").attr('disabled', true);
+		$("#onwer").click();
+		$("#apply_div").show();
+		
+		  if(manager=='true'){
+				$(".owner_text").text("管理者");
+		  }else{
+			  $(".owner_text").text("權利人");
+		  }
+		 
+		  //一類新增2017.10.03
+			$("#onwer_code").val(ownerno_deful);
+			//rec_owner_code=ownerno_deful;
+		  if(ownerno_edit=="false")
+				$("#onwer_code").attr('disabled', true);
+		  //一類新增2017.10.03
+	}else{
+		rec_qry_cl='2';	
+		$("#onwer").click();//2016.12.15致忠提的修改
+		$("#regid").attr('disabled', false);
+		$("#apply_div").hide();
+		
+		$(".owner_text").text("權利人");
+		
+		  //一類新增2017.10.03
+				$("#onwer_code").attr('disabled', false);
+		  //一類新增2017.10.03
+	}
+}
+
+
+function ch_proj(type){
+
+
+	var cl=$("input[name='RadioGroup2']:checked").val();
+	if((type=="03")||(type=="05")||(type=="0B")||(type=="09")||(type=="L2")||(type=="L3")||(type=="B2")||(type=="B3")||(type=="CA")){
+		$("#cltype_div").show();
+		$("#owner_div").show();
+		if(cl=='1'){
+		$("#apply_div").show();
+		$('#onwer_code').val(ownerno_deful);
+		rec_owner_code=ownerno_deful;
+		}
+		
+		//2018.04.16
+		
+		var sn_type=$("input[name='RadioGroup3']:checked").val();
+		if(sn_type=="regid"){
+			
+			owner_prompt();
+		}
+		
+		//2018.04.16
+		
+		
+	}else{
+		$("#cltype_div").hide();
+		$("#owner_div").hide();
+		$("#apply_div").hide();
+		//if(cl!='1')//2017.10.03新增有問題要拿掉
+		$('#onwer_code').val('');//權利人統一編號(清空)
+		$('#apply_code').val('');//申請人統編(清空)
+	}
+	
+	
+//	var cl=$("input[name='RadioGroup2']:checked").val();
+//	if(cl=='1'){
+//		$("#apply_div").show();
+//	}else{
+//		$("#apply_div").hide();
+//	}
+	
+	
+	if((type=="CA")||(type=="CB")){
+//		$("#apply_div").show();
+		$(".case_div").show();
+		$("#cltype_div").show();
+		$("#owner_div").hide();
+		$(".land_div").hide();
+		var city=$("#i_city").find('option:selected').val();
+		$("#c_city").val(city);
+		getOffice(city,"請選擇","#office");
+		//alert(city);
+
+	}else{
+//		$("#apply_div").hide();
+		$(".case_div").hide();
+		$(".land_div").show();
+
+	}
+}
+
+function cleanMap(){
+	//alert(map);
+	//map.removeControl(contextmenu);
+	if (map) {
+	map.setTarget(null);
+	}
+	
+	map.removeLayer(build_image);
+	map.removeLayer(map_vector);
+	map.removeLayer(AllSect_vector);
+	map.removeLayer(vector);
+	map.removeControl(measure_ctl);
+	map.removeControl(showLand_ctl);
+	map.removeControl(showLand_ctl2);
+	map.removeControl(zoom_ctl);
+	map.removeControl(zoom_ctl2);
+//	map.removeControl(pdf_ctl);
+	map.removeControl(scal_ctl);
+	map.removeControl(dxf_ctl);
+	map.removeControl(dxf_ctl2);
+	map.removeControl(img_ctl);
+	map.removeControl(sect_ctl);
+	map.removeControl(rent_ctl);
+	map.removeControl(rent_ctl2);
+	map.removeControl(area_ctl);
+//	map.removeControl(kml_ctl);
+//	map.removeControl(edoc_ctl);
+	map.removeControl(g158_ctl);
+	map.removeControl(taobao_ctl);
+	map.removeControl(gps_ctl);
+	map.removeControl(gps_ctl2);
+	map.removeControl(lonlat_clt);
+	map.removeControl(address_clt);
+	map.removeControl(cleanExt_clt);
+//	map.removeControl(point_clt);
+//	if(overlay!=undefined)
+//	 overlay.setPosition(undefined);
+	//map.removeOverlay(overlay);
+	 overlay.setPosition(undefined);
+	 cleanMapExtent();
+}
+
+
+function cleanSectLayer(){//只清地籍圖圖層
+map.removeLayer(AllSect_vector);
+}
+
+var print_msg=0;
+function printContent(){
+	
+	   var version=$.browser.version;
+	   if($.browser.msie){
+		if(version==11)	{
+	    if( (window.location.href).indexOf('https')!=-1 ){
+	      if(print_msg==0)
+	      {
+		  alert('使用IE11查詢列印，可能會發生空白，需啟用顯示混合的內容，詳細設定請參考上方更版說明');
+	      print_msg++;
+	      return;
+	      }
+	    }
+		}
+	  }
+	
+	  var print_div='.content';
+	  var import_css=false;
+	  var import_style=true;
+	  
+	  if($(".content").text()==""){
+		  alert('請先查詢內容');
+		  return;
+	  }
+	
+	  
+	  if ( $(".map").is(':visible') ){//地圖畫面存在直接印地圖
+		  if($(".content").text().search('地籍圖')!=-1){//地籍圖的處理
+		      $( "#dialog-print" ).dialog("open");
+		  }else{
+			  //printMaps(".map");
+			  
+			  //printBuildMaps(".map");
+			  showBuildMapList();
+		  }
+		  return;
+	  }
+	  
+	  if(($("#menu_btn li.active").attr('id')=="hlink3")&&($(".more").is(':visible'))){//如果為異動索引列引，資料數又有分頁，要自動幫他印出全部
+		  //alert('有多頁異動索引');
+		  printMultiPage();
+		  return;
+	  }
+	
+	  var title_info= $(".print_head").html()==undefined?'':$(".print_head").html();
+	  if(print_head!=undefined)
+	  title_info=print_head; 
+	  //$(print_div).print({   globalStyles : false, prepend : title_info,noPrintSelector: ".TabbedPanels"});
+	  $(print_div).print({   globalStyles : false,title: html_title, prepend : title_info,noPrintSelector: "script,.TabbedPanels,#search_div"});
+	  title_info=null;
+	
+}
+
+
+
+
+function outDataContent(){
+	//alert('輸出格式');
+	
+	 if($(".content").text()==""){
+		  alert('請先查詢內容');
+		  return;
+	  }
+	 
+
+		$.ajax({
+			url: "./result_getResult",
+			type: "POST",
+	   		dataType : "json",
+	   		data:{type:'OutDATA',w:temp_cmdData.W},
+			error: function(xhr) {
+				hideSendMsg();
+			alert("資料輸出失敗");
+		    },
+		    beforeSend:function(){
+		    	showSendMsg("資料輸出中…");
+			},
+			success: function(data) {
+				hideSendMsg();
+				//$(".content").html(response);
+				var path=data.text;
+		        if(path.search('temp')!=-1){
+		                         //window.location=base_url+'/GetFile/'+path;
+		                         window.location='./GetFile/'+path;
+		         }else{
+		                         alert(path);  
+		        }
+		    }
+		});
+	 
+	 
+	 
+	 
+}
+
+
+function getTitleInfo(){//暫時未處理
+	return "";
+}
+
+function toPrintMap(){
+//	var print_type=$("input[name='print_type']:checked").val();
+//	if(print_type=='screen'){
+//		closeBaseMap();
+//		setTimeout(function() {printMaps(".map");},500);
+//	}else{
+//		exportPDF();
+//	}
+	
+	
+	if(($.browser.msie)||($.browser.mozilla)){
+	  printByPDFIMG('IMD');
+	    //$( "#dialog-image" ).dialog( "open" );
+	}else{
+		
+	   printByPDFIMG('PMD');
+	}
+}
+
+
+//function printBuildMaps(div_id) {
+//	  var image_url=simage_url+"&print=true&city="+DLData.city+"&town="+DLData.town+"&sectno="+DLData.sectno+"&buildno="+parseBuildNo8(DLData.mno+'-'+DLData.cno);
+//
+//	  var win = window.open('');
+//	
+//	  
+//	     var version=$.browser.version;
+//	     win.document.write('<style>@page {size: auto;margin: 0mm;}</style>');
+//	  
+//		if($.browser.msie){
+//	        win.document.write('<img id="print_build_img" src="' + image_url + '" height="100%" width="100%"  />'); 
+//		}else if($.browser.chrome){
+//			//win.document.write('<img id="print_build_img" src="' + image_url + '"/>');
+//			  win.document.write('<img id="print_build_img" src="' + image_url + '"/>'); 
+//		}else{	
+//			 win.document.write('<img id="print_build_img" src="' + image_url + '"  height="99%" width="99%"  />');
+//			 
+//		}	
+//		
+//		 win.document.getElementById("print_build_img").onload = function() {
+//			 printImgcallback(win);
+//		};
+//	
+//}
+
+function showBuildMapList() {
+	  $( "#image_select" ).dialog( "open" );
+}
+
+function toprintBuildMaps(files) {
+	
+	if(($.browser.msie)||($.browser.mozilla)){
+		 var browser_type=$.browser.msie==true?'IE':'MOZILLA';
+		 printBuildMaps('IBD',files,browser_type);
+	}else{
+		
+		 printBuildMaps('PBD',files,'');
+		
+	}
+	
+
+}
+	
+function printBuildMaps(type,files,browser_type) {
+    var buildno=parseBuildNo8(DLData.mno+'-'+DLData.cno);
+	$.ajax({
+		url: "./result_getResult",
+		type: "POST",
+		dataType : "json",
+		error: function(xhr) {
+		alert("取得資料失敗");
+		hideSendMsg();
+	    },
+		data:{city:DLData.city,town:DLData.town,sectno:DLData.sectno,buildno:buildno,file_path:DLData.file_name,type:type,proj:DLData.proj,browser_type:browser_type,select_file:files},
+	    beforeSend:function(){
+			showSendMsg('列印中…');
+		},
+		success: function(data) {
+		
+			var url="./GetFile"+data.file_url;
+			if(type=='IBD'){
+			
+				toPrintHtml(url);
+			}else{	
+				
+			  toPrintPDF(url);
+			}
+			hideSendMsg();
+	    }
+	});
+}
+
+function printImgcallback(win) {
+	  win.document.close();
+	  win.focus();
+	  win.print();
+	  win.close();
+
+}
+
+function printMaps(div_id) {
+	$('body').css('background-image', 'none');
+	var sub_menu=$('#TabbedPanels1');
+    var body               = $('body');
+    var mapContainer       = $(div_id);
+    var mapContainerParent = mapContainer.parent();
+    var printContainer     = $('<div>');
+
+ 
+    
+    printContainer
+        .addClass('print-container')
+        .css('position', 'relative')
+        .height(mapContainer.height())
+        .append(mapContainer)
+        .prependTo(body);
+
+    var content = body
+        .children()
+        .not('script')
+        .not(printContainer)
+        .detach();
+
+    /*
+     * Needed for those who use Bootstrap 3.x, because some of
+     * its `@media print` styles ain't play nicely when printing.
+     */
+    var patchedStyle = $('<style>')
+        .attr('media', 'print')
+        .text('img { max-width: none !important; }' +
+              'a[href]:after { content: ""; }')
+        .appendTo('head');
+
+    //document.title = "My new title";
+    window.print();
+
+   
+    body.prepend(content);
+    mapContainerParent.prepend(mapContainer);
+//
+    printContainer.remove();
+    patchedStyle.remove();
+   // $("#TabbedPanels1").show();
+    $('body').css('background-image', 'url(images/hinet/container_bg.gif)');
+    openBaseMap();
+   // setTimeout(function() {openBaseMap();},500);//打開地圖
+}
+
+
+function chPrintSet(){
+	var print_type=$("input[name='print_type']:checked").val();
+	if(print_type=='screen'){
+		$("#scale_set").hide();
+	}else{
+		$("#scale_set").show();
+	}
+	
+	
+}
+
+
+function userrecord(url,en_qid,en_uid){//使用者記錄查詢
+	  window.open(url+'/userrecord.servlet?HN_Code='+en_uid+'&QID='+en_qid,'_bank');
+}
+
+function initDialog(){
+	
+	 $( "#image_select" ).dialog({
+	      autoOpen: false,
+	      resizable: false,
+	      height: 300,
+	      width: 260,
+	      modal: true,
+	      open: function () { 			
+	      }, buttons: {
+		      "列印": function() {
+	           //toPrintMap();
+	    	   var files="";
+	    	   $('.checkboxImage:checked').each(function() {
+	    		   files+=$(this).val()+",";
+	    	   });
+	    	 
+	    	  if(files==""){
+	    		  alert("請至少取得一張建物平面列印");
+	    		  return;
+	    	  }
+	          $( this ).dialog( "close" );
+	          toprintBuildMaps(files);
+	        }
+	      }
+	    });
+	
+	
+	 $( "#dialog-image" ).dialog({
+      autoOpen: false,
+      resizable: false,
+      height: "auto",
+      width: 600,
+      modal: true,
+      open: function () { 
+ 	   // $("#dialog_image_div").html("./pro/Print.html");
+		 
+		// link('pro/Print.html', '#dialog_image_div');
+		 
+		// $( "#dialog_image_div" ).load( "pro/Print.html" );
+		 
+//		 $.ajax({
+//				type: "POST",
+//				url: "pro/Print.html",
+//				beforeSend:function(){
+//				
+//				},
+//				error: function(xhr) {
+//			     alert('載入資料失敗');
+//			    },
+//				success: function(response) {
+//			    	
+//					$("#dialog_image_div").html(response);
+//					
+//					 printByPDFIMG('IMD');
+//				}
+//			});
+
+		
+      }
+    });
+	
+	
+	   $( "#dialog-print" ).dialog({
+	         autoOpen: false,
+	      resizable: false,
+	      height: "auto",
+	      width: 600,
+	      modal: true,
+	      buttons: {
+	        "列印": function() {
+	           toPrintMap();
+	          $( this ).dialog( "close" );
+	        },
+	        "取消": function() {
+	          $( this ).dialog( "close" );
+	        }
+	      }
+	    });
+	    
+	    
+	     $( "#dialog-map" ).dialog({
+	         autoOpen: false,
+	         resizable: false,
+	         height: "auto",
+	         width: 300,
+	         modal: true,
+	         buttons: {
+	         "儲存": function() {
+	    	   var save_type=$("input[name='map_save_type']:checked").val();
+//	           alert('儲存:'+save_type);
+	           if(save_type=="JPEG"){
+	        	   saveMapImage();
+	           }else{
+	        	   getPdfDxf(DLData);
+	           }
+	           $( this ).dialog( "close" );
+	         }
+	        }
+	      });
+	     
+	     
+	     
+	     $("#dialog-layer").dialog({
+	         autoOpen: false,
+	         resizable: false,
+	         height: "auto",
+	         width: 360,
+	         modal: false,
+	         open: function () { 
+	    	     if(!$('#ckb_baseMap').is(':checked'))
+	    		 $('#ckb_baseMap').trigger('click');
+	    	     
+//	    	     if (!$("#base_map_ctrl").is(':visible') ){
+//	    	    	 $("input[name='switch_base'][value='NLSC']").trigger('click');
+//	    	     }
+	        }, buttons: {   
+            "關閉視窗": function() {   
+	        	$( "#dialog-layer" ).dialog('close');  
+            }}
+	
+	      });
+	     
+	     
+	     $("#dialog-upload").dialog({
+	         autoOpen: false,
+	         resizable: false,
+	         height: "auto",
+	         width: 530,
+	         modal: true
+	
+	      });
+	     
+	     
+	     
+	     $("#dialog-location").dialog({
+	         autoOpen: false,
+	         resizable: false,
+	         height: "auto",
+	         width: 530,
+	         modal: true
+	
+	      });
+	     
+	     $( "#tabs" ).tabs();
+//
+//	     $("#dialog-lonlat").dialog({
+//	         autoOpen: false,
+//	         resizable: false,
+//	         height: "auto",
+//	         width: 530,
+//	         modal: true
+//	
+//	      });
+//	     
+//	     
+//	     
+//	     $("#dialog-door").dialog({
+//	         autoOpen: false,
+//	         resizable: false,
+//	         height: 100,
+//	         width: 400,
+//	         modal: true
+//	      });
+	  
+	     
+	     $("#dialog-door-result").dialog({
+	         autoOpen: false,
+	         resizable: false,
+	         height: "auto",
+	         width: 530,
+	         modal: true
+	
+	      });
+	     
+	     
+	  
+	     $("#dialog-golas").dialog({
+	         autoOpen: false,
+	         resizable: false,
+	         height: "auto",
+	         width: 530,
+	         modal: false,
+	         open: function () { 
+
+	    	    var msg="請稍待右側圖形區域的路名顯圖 右側圖形區域的紅色粗框為預定列段範圍 每張【多目標地籍圖】收費二十元，共計"+pdf_cmd.cashPapers+"張 是否確定查詢？";
+	    	    msg+=pdf_cmd.mesg;
+	    	    $('#golas_msg').empty();
+	    	    $('#golas_msg').html(msg);		
+	         }
+	         , buttons: {   
+	    	     "確認": function() {  
+	            	$( "#dialog-golas" ).dialog('close');  
+	            	treeMBQuery(pdf_cmd.city,pdf_cmd.town,pdf_cmd.sectno,pdf_cmd.number,pdf_cmd.part,pdf_cmd.paper_size,pdf_cmd.scaleVal,pdf_cmd.print_type,pdf_cmd.digitBuild,pdf_cmd.papersStr);
+                 },
+	             "取消": function() {   
+	 	        	$( "#dialog-golas" ).dialog('close');  
+	             }
+	         }
+	      });
+	     
+	     $( "#auth_dialog" ).dialog({
+	    	   
+	           autoOpen: false,
+				//height: 300,
+				//width: 350,
+				modal: true,
+				resizable:false, 
+				open: function( event, ui ) {
+				var d = new Date();
+	            var time = d.getTime();
+				$("#auth_pic").attr("src","./Auth_getImage?enQID="+ensid+"&time="+time);
+				$("#auth_text").val('');
+				},
+				buttons: {
+					"確認": function() {checkAuth($("#auth_text").val(),ensid);},
+					"取消": function() {$("#auth_dialog").dialog( "close" );}
+				}
+	   
+	   
+	   });
+	        
+}
+
+
+
+function landnoTurn(){
+	 var land_turn=$("input[name='land_turn']:checked").val();
+	 if(land_turn=="on"){
+		 show_landno=true;
+	 }else{
+		 show_landno=false;
+	 }
+	 
+	 map_vector.setStyle(styleFunction);
+}
+
+
+function landFillTurn(){
+	
+	 var land_fill=$("input[name='land_fill']:checked").val();
+	 
+	 if(land_fill=="on"){
+		 parcel_fill=true;
+	 }else{
+		 parcel_fill=false;
+	 }
+	 
+	 map_vector.setStyle(styleFunction);
+	
+}
+
+function switchBaseLayer(){
+	
+//	if(!$('#ckb_baseMap').is(':checked'))
+//		return;
+	
+	 var switch_base=$("input[name='switch_base']:checked").val();
+
+	 map.removeLayer(nlsc);
+	 map.removeLayer(osm);
+	 map.removeLayer(TGOS);
+	 map.removeLayer(photo2_map);
+	 if(switch_base=="OSM"){
+//			map.removeLayer(nlsc);
+		 if(osm==undefined){
+		 osm=new ol.layer.Tile({source: new ol.source.OSM()});
+		 }
+		setBaseLayer(osm);
+		 
+	 }else if(switch_base=="NLSC"){
+//			map.removeLayer(osm);
+			setBaseLayer(nlsc);
+		
+	 }else if(switch_base=="TGOS"){
+	
+
+		 if(TGOS==undefined){
+		 TGOS=loadTgosLayer();
+		  
+		  $.when(TGOS).done(function(){
+			  setBaseLayer(TGOS);
+		  });
+		 }else{
+			 setBaseLayer(TGOS);
+		 }
+		 
+		 
+		
+	 }else if(switch_base=="PHOTO2"){
+		 setBaseLayer(photo2_map);
+	 }else{
+		
+		 
+	 }
+	
+}
+
+
+function loadBaseMap(id){
+	
+	if($('#'+id).is(':checked')){
+		openBaseMap();
+	}else{
+		closeBaseMap();
+	}
+}
+
+function openBaseMap(){
+	switchBaseLayer();
+	$(".map_type").attr('disabled', false);
+}
+
+function closeBaseMap(){
+	 map.removeLayer(nlsc);
+	 map.removeLayer(osm);
+	 map.removeLayer(TGOS);
+	 $(".map_type").attr('disabled', true);
+}
+
+function loadOtherMap(id){
+	
+
+	if($('#'+id).is(':checked')){
+		if(id=="ckb_city"){
+			map.removeLayer(city_map);
+		    map.addLayer(city_map);
+		}else if(id=="ckb_town"){
+			map.removeLayer(town_map);
+			
+//			$.when(town_map).done(function(){
+				  map.addLayer(town_map);
+//			});
+		 
+		}else if(id=="ckb_sect"){
+			map.removeLayer(sect_map);
+		    map.addLayer(sect_map);
+		}else if(id=="ckb_village"){
+		    map.removeLayer(village_map);
+		    map.addLayer(village_map);
+		}
+	}else{ 
+		   if(id=="ckb_city"){
+			    map.removeLayer(city_map);
+			}else if(id=="ckb_town"){
+				map.removeLayer(town_map);
+			}else if(id=="ckb_sect"){
+				 map.removeLayer(sect_map);
+			}else if(id=="ckb_village"){
+				 map.removeLayer(village_map);
+			}
+	}
+}
+
+function submitCmForm(formId,actionUrl,msg){ 
+	$('#' + formId).ajaxSubmit({
+		type : "POST",
+		url : actionUrl,
+		dataType : "json",
+		beforeSend : function() {
+		showSendMsg(msg);
+		},
+		error : function(xhr, textStatus, errorThrown) {
+			//showMessage(msg+"失敗:" + xhr.status + ":" + errorThrown,"msg_panel", 3000);
+			hideSendMsg();
+			alert("上傳失敗");
+		},
+		success : function(response) {
+			hideSendMsg();
+			//$("#"+targetdiv).html(response);
+		}
+	});
+}
+
+
+function switchContent(type){ 
+	if(type=="1"){
+		if(contextmenu!=undefined){
+			contextmenu.close();
+		    contextmenu.clear();
+		    try{
+		    map.removeControl(contextmenu);
+		    }catch(e){
+		    }
+		}
+		$("#parcel_ctrl").hide();
+		$("#content").hide();
+		$("#home_map").show();
+		$("#base_map_ctrl").show();
+		cleanMap();
+		addHomeMapCtrl();
+		initMapViewByID('home_map');
+		autoGpsMaker(rec_x,rec_y);
+//		if(!$('#ckb_baseMap').is(':checked'))
+//			 $('#ckb_baseMap').trigger('click');
+		
+		if(!$('#ckb_town').is(':checked')){
+		switchAutoCickLayer("#ckb_town");
+		}
+		if(rec_extend!=undefined)
+		map.getView().fit(rec_extend, map.getSize());
+	}else{
+		closeGpsButton();
+		$("#base_map_ctrl").hide();
+		$("#parcel_ctrl").show();
+		$("#content").show();
+		$("#home_map").hide();
+		$(".home_map").empty();
+		if($('#ckb_town').is(':checked')){
+			switchAutoCickLayer("#ckb_town");
+		}
+		
+		
+		//切為地圖模試如果是osm要幫他選nlsc
+		
+		 var switch_base=$("input[name='switch_base']:checked").val();
+		 if(switch_base=="OSM"){
+			
+			 //$("input[name='switch_base']:checked").val('NLSC');
+			 $("input[name='switch_base'][value='NLSC']").trigger('click');
+	    	 switchBaseLayer();
+	     }
+//		if($('#ckb_baseMap').is(':checked'))
+//			 $('#ckb_baseMap').trigger('click');
+		
+	}
+}
+
+function autoGpsMaker(x,y){
+	if(x==undefined||y==URIError)
+		return;
+	var show_text="(x坐標:"+x+",y坐標:"+y+")";
+	toLocate(x,y,show_text);
+}
+
+function recordMapXY(lat,lon){
+	rec_x=lat;
+	rec_y=lon;
+}
+
+function switchAutoCickLayer(id){ 
+//	setTimeout(function(){
+//    $(id).trigger('click');
+//	}, 3000);
+	
+	 map.once('postrender', function(event) {
+		 $(id).trigger('click');
+		// console.log('載入鄉鎮圖');
+	 });
+}
+
+
+function toGPS(){ 
+//	if (navigator.geolocation) {
+//		showSendMsg("定位中…");
+//		  navigator.geolocation.getCurrentPosition(locateSuccess);
+//	} else {
+//		  error('瀏覽器不支授');
+//	}
+	
+	var options = {
+			enableHighAccuracy : true,
+			timeout : 5000,
+			maximumAge : 0
+		};
+		if (navigator.geolocation) {
+			navigator.geolocation.getCurrentPosition(locateSuccess , locateError, options);
+		} else { 
+			alert("瀏覽器不支援定位功能");
+			console.log("Geolocation is not supported by this browser.");
+		}
+}
+
+function locateSuccess(position){ 
+	map.removeLayer(locate_mark);
+	hideSendMsg();
+	var mark_point=new ol.geom.Point(ol.proj.transform([position.coords.longitude,position.coords.latitude], 'EPSG:4326', 'EPSG:3857'));
+	locate_mark=getMarker(mark_point,'locate',mark_img1,"(x坐標:"+position.coords.longitude+",y坐標:"+position.coords.latitude+")");
+	map.addLayer(locate_mark);
+	//alert("x:"+position.coords.longitude+",y:"+position.coords.latitude);
+	var point = ol.proj.fromLonLat([position.coords.longitude,position.coords.latitude]);
+    var view = new ol.View({center: point,zoom:17});
+    map.setView(view);
+}
+
+
+function locateError(err) { 
+	var message="";
+	if (err.code === 1) { // PERMISSION_DENIED
+		message = "Permission denied. - " + err.message;
+	} else if (err.code === 2) { //POSITION_UNAVAILABLE
+		message = "Make sure your network connection is active and " +
+            "try this again. - " + err.message;
+	} else if (err.code === 3) { //TIMEOUT
+		message = "A timeout ocurred; try again. - " + err.message;
+	}		
+	console.log('ERROR(' + err.code + '): ' + err.message); 
+	alert( ' 取得目前定位失敗  , ERROR(' + err.code + '): '  + message);
+};
+
+function ssoChCity(title,city){
+	
+	 if (confirm('是否登出[e點通電傳資訊]'+'\r\n'+'並切換到['+title+']')){
+         userrecord(context_path,ensid,enuid);
+         location.href=context_path+'/CountyChange.servlet?COUNTY='+city;
+      }
+}
+
+function readNote(){//讀取公告訊息
+	 $.ajax({
+			url: "./Qry_QryNote",
+			type: "POST",
+			dataType : "json",
+			error: function(xhr) {
+			alert("讀取公告失敗");
+		    },
+		    beforeSend:function(){
+		    	$('#note_div').empty();
+		    	showSendMsgDiv('#note_div','讀取資料中');
+			},
+			success: function(data) {
+				hideSendMsgDiv('#note_div');
+				$('#note_div').html('<ul class="news_text"></ul>');
+				$.each(data, function(i, m) {
+				 $('.news_text').append('<li>'+m.date+"  "+m.text+'</li>');
+				});
+		    }
+		});
+}
+
+function setInitCity(id){
+    if(init_city=="")
+    	return;
+	getTown(init_city,'請選擇', '.township');
+	getCityScope(init_city);
+}
+
+function chkBorowser(){
+
+	var version=$.browser.version;
+	if($.browser.msie){
+		//alert(version);
+		if(version<=10){
+			alert("本系統不支援IE10以下版本，請使用Chrome、Firefox、IE10以上版本的瀏覽器。");
+			//location.href='https://www.microsoft.com/zh-tw/download/internet-explorer.aspx';
+			window.open("help/guide.html","","toolbar=no,status=yes,scrollbars=yes,resizable=yes,width=900,height=650");
+		}
+		return;
+	}else if($.browser.webkit){
+		
+		return;
+	}else if($.browser.mozilla){
+		return;
+	}
+}
+
+
+function getRareWords(id,city){//取得罕用字
+//	try{
+//     rwObj.RenderByCss(id,city);
+//	}catch(e){
+//		console.log('罕用字錯誤:'+e);
+//	}
+}
+
+
+function cleanMapExtent(){
+	 map.getOverlays().clear();
+	 vector.getSource().clear();
+	 map.addOverlay(overlay);
+}
+
+
+
+function LogOut(){
+window.location.href='./Logout.action';
+}
+
+
+//function initRoadCombobox(id,text_id,def_text){
+//	$( function() {
+//	    $.widget( "custom.combobox", {
+//	      _create: function() {
+//	        this.wrapper = $( "<span>" )
+//	          .addClass( "custom-combobox" )
+//	          .insertAfter( this.element );
+//	 
+//	        this.element.hide();
+//	        this._createAutocomplete();
+//	        this._createShowAllButton();
+//	      },
+//	 
+//	      _createAutocomplete: function() {
+//	        var selected = this.element.children( ":selected" ),
+//	         // value = selected.val() ? selected.text() : "";
+//	        value =def_text;
+//	 
+//	        this.input = $( "<input>" )
+//	          .appendTo( this.wrapper )
+//	          .val( value )
+//	          .attr( "title", "" )
+//	          .addClass( "custom-combobox-input ui-widget ui-widget-content ui-state-default ui-corner-left" )
+//	          .autocomplete({
+//	            delay: 0,
+//	            minLength: 0,
+//	            source: $.proxy( this, "_source" )
+//	          })
+//	          .on( "mousedown", function() {
+//	        	  this.value = '';
+//	        	  wasOpen = false;
+//	        	  //this.autocomplete( "search", "" );
+//	          })
+//	          .tooltip({
+//	            classes: {
+//	              "ui-tooltip": "ui-state-highlight"
+//	            }
+//	          });
+//	 
+//	        this._on( this.input, {
+//	          autocompleteselect: function( event, ui ) {
+//	            ui.item.option.selected = true;
+//	            this._trigger( "select", event, {
+//	              item: ui.item.option
+//	            });
+//	            $(text_id).val(ui.item.option.text);
+//	            
+//	            //test
+//	            changeLane('.country','.township','#road','.tunnel_doorname');
+//	            setLoadText('#keyin','#road','.tunnel_doorname','.alley_doorname','#no','#floor');
+//	            s_road=ui.item.option.text;	            
+//	            //test
+//	            
+//	          },
+//	 
+//	          autocompletechange: "_removeIfInvalid"
+//	        });
+//	      },
+//	 
+//	      _createShowAllButton: function() {
+//	        var input = this.input,
+//	          wasOpen = false;
+//	 
+//	        $( "<a>" )
+//	          .attr( "tabIndex", -1 )
+//	          .attr( "title", "可輸入路名關鍵字快速找尋" )
+//	          .tooltip()
+//	          .appendTo( this.wrapper )
+//	          .button({
+//	            icons: {
+//	              primary: "ui-icon-triangle-1-s"
+//	            },
+//	            text: false
+//	          })
+//	          .removeClass( "ui-corner-all" )
+//	          .addClass( "custom-combobox-toggle ui-corner-right" )
+//	          .on( "mousedown", function() {
+//	            wasOpen = input.autocomplete( "widget" ).is( ":visible" );
+//	          })
+//	          .on( "click", function() {
+//	            input.trigger( "focus" );
+//	 
+//	            // Close if already visible
+//	            if ( wasOpen ) {
+//	              return;
+//	            }
+//	 
+//	            // Pass empty string as value to search for, displaying all results
+//	            input.autocomplete( "search", "" );
+//	          });
+//	      },
+//	 
+//	      _source: function( request, response ) {
+//	        var matcher = new RegExp( $.ui.autocomplete.escapeRegex(request.term), "i" );
+//	        response( this.element.children( "option" ).map(function() {
+//	          var text = $( this ).text();
+//	          
+//	          if ( this.value && ( !request.term || matcher.test(text) ) )
+//	            return {
+//	              label: text,
+//	              value: text,
+//	              option: this
+//	            };
+//	          
+//	        }) );
+//	      },
+//	 
+//	      _removeIfInvalid: function( event, ui ) {
+//	 
+//	        // Selected an item, nothing to do
+//	        if ( ui.item ) {
+//	          return;
+//	        }
+//	 
+//	        // Search for a match (case-insensitive)
+//	        var value = this.input.val(),
+//	          valueLowerCase = value.toLowerCase(),
+//	          valid = false;
+//	        this.element.children( "option" ).each(function() {
+//	          if ( $( this ).text().toLowerCase() === valueLowerCase ) {
+//	            this.selected = valid = true;
+//	            return false;
+//	          }
+//	        });
+//	 
+//	        // Found a match, nothing to do
+//	        if ( valid ) {
+//	          return;
+//	        }
+//	 
+//	        this.input.val(def_text);
+//	        // Remove invalid value
+////	        this.input
+////	          .val( "" )
+////	          .attr( "title", value + " didn't match any item" )
+////	          .tooltip( "open" );
+//	        this.element.val( "" );
+////	        this._delay(function() {
+////	          this.input.tooltip( "close" ).attr( "title", "" );
+////	        }, 2500 );
+//	        this.input.autocomplete( "instance" ).term = "";
+//	      },
+//	 
+//	      _destroy: function() {
+//	        this.wrapper.remove();
+//	        this.element.show();
+//	      }
+//	      
+//	    });
+//	 
+//	    $(id).combobox();
+//	  } );
+//	
+//	
+//}
+
+function initRoadCombobox(id,text_id,def_text){
+//	alert('init');
+//	 $( function() {
+		    $.widget( "custom.combobox", {
+		      _create: function() {
+		        this.wrapper = $( "<span>" )
+		          .addClass( "custom-combobox" )
+		          .insertAfter( this.element );
+		 
+		        this.element.hide();
+		        this._createAutocomplete();
+		        this._createShowAllButton();
+		      },
+		 
+		      _createAutocomplete: function() {
+		        var selected = this.element.children( ":selected" ),
+		          value = selected.val() ? selected.text() : "";
+		 
+		        this.input = $( "<input>" )
+		          .appendTo( this.wrapper )
+		          .val( value )
+		          .attr( "title", "" )
+		          .addClass( "custom-combobox-input ui-widget ui-widget-content ui-state-default ui-corner-left" )
+		          .autocomplete({
+		            delay: 0,
+		            minLength: 0,
+		            source: $.proxy( this, "_source" )
+		          })
+		          .tooltip({
+		            classes: {
+		              "ui-tooltip": "ui-state-highlight"
+		            }
+		          });
+		 
+		        this._on( this.input, {
+		          autocompleteselect: function( event, ui ) {
+		            ui.item.option.selected = true;
+		            this._trigger( "select", event, {
+		              item: ui.item.option
+		            });
+		          },
+		 
+		          autocompletechange: "_removeIfInvalid"
+		        });
+		      },
+		 
+		      _createShowAllButton: function() {
+		        var input = this.input,
+		          wasOpen = false;
+		 
+		        $( "<a>" )
+		          .attr( "tabIndex", -1 )
+		          .attr( "title", "Show All Items" )
+		          .tooltip()
+		          .appendTo( this.wrapper )
+		          .button({
+		            icons: {
+		              primary: "ui-icon-triangle-1-s"
+		            },
+		            text: false
+		          })
+		          .removeClass( "ui-corner-all" )
+		          .addClass( "custom-combobox-toggle ui-corner-right" )
+		          .on( "mousedown", function() {
+		            wasOpen = input.autocomplete( "widget" ).is( ":visible" );
+		          })
+		          .on( "click", function() {
+		            input.trigger( "focus" );
+		 
+		            // Close if already visible
+		            if ( wasOpen ) {
+		              return;
+		            }
+		 
+		            // Pass empty string as value to search for, displaying all results
+		            input.autocomplete( "search", "" );
+		          });
+		      },
+		 
+		      _source: function( request, response ) {
+		        var matcher = new RegExp( $.ui.autocomplete.escapeRegex(request.term), "i" );
+		        response( this.element.children( "option" ).map(function() {
+		          var text = $( this ).text();
+		          if ( this.value && ( !request.term || matcher.test(text) ) )
+		            return {
+		              label: text,
+		              value: text,
+		              option: this
+		            };
+		        }) );
+		      },
+		 
+		      _removeIfInvalid: function( event, ui ) {
+		 
+		        // Selected an item, nothing to do
+		        if ( ui.item ) {
+		          return;
+		        }
+		 
+		        // Search for a match (case-insensitive)
+		        var value = this.input.val(),
+		          valueLowerCase = value.toLowerCase(),
+		          valid = false;
+		        this.element.children( "option" ).each(function() {
+		          if ( $( this ).text().toLowerCase() === valueLowerCase ) {
+		            this.selected = valid = true;
+		            return false;
+		          }
+		        });
+		 
+		        // Found a match, nothing to do
+		        if ( valid ) {
+		          return;
+		        }
+		 
+		        // Remove invalid value
+		        this.input
+		          .val( "" )
+		          .attr( "title", value + " didn't match any item" )
+		          .tooltip( "open" );
+		        this.element.val( "" );
+		        this._delay(function() {
+		          this.input.tooltip( "close" ).attr( "title", "" );
+		        }, 2500 );
+		        this.input.autocomplete( "instance" ).term = "";
+		      },
+		 
+		      _destroy: function() {
+		        this.wrapper.remove();
+		        this.element.show();
+		      }
+		    });
+		 
+		   // $( id ).combobox();
+		    //$( "#toggle" ).on( "click", function() {
+		      //$( "#combobox" ).toggle();
+		    //});
+//		  } );
+	 
+	 
+	  $( id ).combobox();
+}
+
+function setSelectVal(id,val){
+	 $(id+" option[value="+val+"]").prop('selected', true);
+}
+
+
+function getDisabledVal(id){
+	if($(id).prop('disabled')==true)
+		return "";
+	return $(id).val();
+}
+
+function chAuthImage(enQid){
+	var d = new Date();
+    var time = d.getTime();
+	$("#auth_pic").attr("src","./Auth_repalceImage?enQID="+enQid+"&time="+time);
+}
+
+
+function owner_prompt(){
+	//alert('提示:'+rec_proj2);
+	
+	if(rec_proj=="03"||rec_proj=="09"||rec_proj2=="L2"||rec_proj2=="B2"){
+		$("#onwer_code").attr("placeholder", "請輸入登記次序(4碼)");
+	}
+	
+	if(rec_proj=="05"||rec_proj=="0B"||rec_proj2=="L3"||rec_proj2=="B3"){
+		$("#onwer_code").attr("placeholder", "請輸入登記次序(7碼)");
+	}
+}
+
+
+
+function InitialCssByCss(Selector,CountyCode) {
+	
+	
+    var headID = document.getElementsByTagName("head")[0];
+	
+//    if(headID.innerHTML.indexOf(CountyCode+".TTE")!=-1)
+//    	return;
+	
+    var newCss = document.createElement('style');
+    var inner = "@font-face { font-family: '#City#'; src: url('./font/#City#.TTE');font-weight: normal; font-style: normal; } #Selector# {font-family: \"#City#\";}";
+    newCss.innerHTML = inner.replace(/\#City#/g, CountyCode).replace('#Selector#', Selector);
+    headID.appendChild(newCss)
+    console.log(headID.innerHTML);
+}
+
+
+function initFont(CountyCode) {
+	if(!css_word)
+	return;
+	
+	var headID = document.getElementsByTagName("head")[0];
+//	 console.log(headID.innerHTML);
+	 
+	 if(headID.innerHTML.indexOf(CountyCode+".TTE")==-1)
+	    {
+	 var newCss = document.createElement('style');
+	 var inner = "@font-face { font-family: '#City#'; src: url('./font/#City#.TTE');font-weight: normal; font-style: normal; }";
+	 newCss.innerHTML = inner.replace(/\#City#/g, CountyCode);
+	 headID.appendChild(newCss);
+	    }
+	
+	 initWordCss(".township",CountyCode);
+	 initWordCss(".section",CountyCode);
+	   
+}
+
+
+function initWordCss(div_id,CountyCode) {
+	//alert(CountyCode);
+	if(!css_word)
+		return;
+	if((CountyCode==undefined)||(CountyCode==""))
+		return;
+	$(div_id).css("font-family", CountyCode);
+}
+
+
+function landAutoSelect(city,town,sectno,type,landbuildno){
+	//$("#hlink1").click();
+	//link('menu/LandBuild.jsp', '#menu_content');
+	
+	var select_id=$("#menu_btn li.active").attr('id');
+
+	
+	if(select_id!='hlink1'){
+	$( "#menu_content" ).load( "menu/LandBuild.jsp", function( response, status, xhr ) {
+		toLandAutoSelect(city,town,sectno,type,landbuildno);
+
+		
+	});
+	}else{
+		 toLandAutoSelect(city,town,sectno,type,landbuildno);
+	}
+	
+
+	
+	
+//	s_city=city;
+//	s_town=town;
+//	s_sectno=sectno;
+//	getTown(s_town,'請選擇', '.township');
+//	getSect(s_city, s_town, '請選擇地段', '.section');
+//	cleanAllClass('#menu_btn','active');
+//	addClass('#hlink1','active');
+//	$('.country').val(city);
+//	$('.township').val(town);
+//	$('.sectioncode').val(sectno);
+//	if(type=='1'){
+//		$("#RLAND").click();
+//		var s_landno8=parseLandNo8(landbuildno);
+//		landbuildno=parseLandNoBrief(s_landno8);
+//	}else{
+//		$("#RBUILD").click();
+//		var s_buildno8=parseBuildNo8(landbuildno);
+//		landbuildno=parseBuildNoBrief(s_buildno8);
+//	}
+//	$('.number').val(landbuildno);
+
+	
+}
+
+function toLandAutoSelect(city,town,sectno,type,landbuildno){
+	cleanAllClass('#menu_btn','active');
+	addClass('#hlink1','active');
+	
+	s_city=city;
+	s_town=town;
+	s_sectno=sectno;
+	getTown(s_town,'請選擇', '.township');
+	getSect(s_city, s_town, '請選擇地段', '.section');
+	
+	$('.country').val(city);
+	$('.township').val(town);
+	$('.sectioncode').val(sectno);
+	if(type=='1'){
+		$("#RLAND").click();
+		var s_landno8=parseLandNo8(landbuildno);
+		landbuildno=parseLandNoBrief(s_landno8);
+	}else{
+		$("#RBUILD").click();
+		var s_buildno8=parseBuildNo8(landbuildno);
+		landbuildno=parseBuildNoBrief(s_buildno8);
+	}
+	$('.number').val(landbuildno);
+}
+
+function itemAutoSelect(type,item){
+	
+	if(type=='1'){
+	    item=(item.indexOf("3")!=-1)||(item.indexOf("5")!=-1)?"0"+item:item;
+	    $('#projectL').val(item);
+	}else{
+		item=(item.indexOf("9")!=-1)||(item.indexOf("B")!=-1)?"0"+item:item;
+		$('#projectB').val(item);
+	}
+}
+
+
+
+function searchTreeText(text){
+	$("#rec_list .land_folder").each(          function() {
+		var li_text= $(this).text();
+		console.log('aa1:'+li_text);
+		if(li_text.indexOf(text) != -1){
+			$(this).show();
+		}else{
+			$(this).siblings().find('li').hide();
+			//$(this).hide();
+//			 $(this).children('>li').each(          function() {
+//				 //$(this).hide();
+//					console.log('aa2:'+$(this).text());
+//			 });
+			//$(this).children().hide(); 
+		}
+		
+		//alert(li_text);
+//		var pinyin = $(this).attr("pinyin");            var cityName = $(this).attr("cityName");            if (pinyin.indexOf(searchCityName) != -1
+//		|| cityName.indexOf(searchCityName) != -1) {
+//		$(this).show();
+//		} else {
+//		$(this).hide();
+//		}
+		});
+}
+
+function chCaseType(type){
+
+	if(type=="single"){
+		$("#case_city_d").show();
+		$("#case_city_d2").hide();
+	}else{
+		
+		$("#case_city_d").hide();
+		$("#case_city_d2").show();
+	}
+		
+	
+}
+
+
+
+
+
+//this.RenderByCss = function (Selector, CountyCode) {
+//    InitialCssByCss(Selector, CountyCode);
+//};
+

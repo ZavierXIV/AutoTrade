@@ -1,0 +1,311 @@
+function indexQuery(){//異動所引查詢
+	var city=$(".country").find('option:selected').val();
+	var town=$(".township").find('option:selected').val();
+	var sectno=$('.sectioncode').val();//段號
+	var number=$('#number').val();//地號
+	var code=$('#onwer_code').val();//權利人統一編號
+	var apply_code=$('#apply_code').val();//申請人統編
+//	var qry_type=$("input[name='ctrl_land']:checked").val()=='land'?'L':'B';
+	var qry_type=$("input[name='RadioGroup1']:checked").val();
+	var sn_type=$("input[name='RadioGroup3']:checked").val();
+	var project=$("#project"+qry_type).find('option:selected').val();
+	if($(".country").find('option:selected').val()==""){
+		alert("請選擇縣市");
+		return;
+	}
+	
+	if($(".township").find('option:selected').val()==""){
+		alert("請選擇鄉鎮");
+		return;
+	}
+	
+	if($(".section").find('option:selected').val()==""){
+		alert("請選擇地段");
+		return;
+	}
+	
+	if(sectno=="輸入數值"){
+		alert("請輸入段代碼");
+		return;
+	}
+	
+	if(project==""){
+		alert("請選擇查詢項目");
+		return;
+	}
+	
+	if(number==""){
+		if(qry_type=='L')
+		alert("請輸入地號");
+		if(qry_type=='B')
+		alert("請輸入建號");
+		return;
+	}
+	
+	
+	var data = new Object();
+	if($("#cltype_div").is(':visible'))//當1二類畫面有出現時才去設定值，不然預設都是二類查詢
+	{
+		var cl=$("input[name='RadioGroup2']:checked").val();
+		if((cl=='1')&&(code==""))
+		{
+				alert("選擇一類時需輸入統編");
+				return;
+		}
+		if((cl=='1')&&(apply_code==""))
+		{
+				alert("選擇一類時需輸入申請人統編");
+				return;
+		}
+		data.menu_cl=cl;
+		data.cl=cl;
+	}else{
+		data.cl='2';
+	}
+	
+	
+	data.city=city;
+	data.town=town;
+	data.sectno=sectno;
+	data.landbuild=number;
+	data.project=project;
+	data.code=code;
+	data.sn_type=sn_type;
+	data.apply_code=apply_code;
+	toGetCmd(data);		
+}
+
+
+function indexCaseQuery(){
+	var office=$('#office').find('option:selected').val();
+	var word=$('#sCaseYear').find('option:selected').val();//收件字
+    var type=$("input[name='case_city_r']:checked").val();
+	if(type!="single")
+		word=$('#sCaseYear2').find('option:selected').val();
+	var caseYear=$("#caseYear").val();//收件年
+	var number=$("#caseNo").val();//收件號
+	var qry_type=$("input[name='RadioGroup1']:checked").val();
+	var project=$("#project"+qry_type).find('option:selected').val();
+	var apply_code=$('#apply_code').val();//申請人統編
+	if(office=='')
+	{
+		alert('請選擇地所');
+		return;
+	}
+	
+	if(caseYear=='')
+	{
+		alert('請填入收件年');
+		return;
+	}
+	
+	if(word=='')
+	{
+		alert('請選擇收件字');
+		return;
+	}
+	
+	
+	if(number=='')
+	{
+		alert('請填入收件號');
+		return;
+	}
+	
+	number=addZero(6,number);
+	
+	
+	var caseno=caseYear+word +number;
+	
+	var data = new Object();
+	if($("#cltype_div").is(':visible'))//當1二類畫面有出現時才去設定值，不然預設都是二類查詢
+	{
+		var cl=$("input[name='RadioGroup2']:checked").val();
+		if((cl=='1')&&(apply_code==""))
+		{
+				alert("選擇一類時需輸入申請人統編");
+				return;
+		}
+		data.menu_cl=cl;
+		data.cl=cl;
+	}else{
+		data.cl='2';
+	}
+	data.office=office;
+	data.caseno=caseno;
+	data.project=project;
+	data.apply_code=apply_code;
+	toGetCmd(data);		
+}
+
+function indexCaseTreeQuery(office,caseno,project,apply_code){
+	var data = new Object();
+	data.office=office;
+	data.caseno=caseno;
+	data.project=project;
+	data.apply_code=apply_code;
+	toGetCmd(data);		
+	
+}
+
+
+function rsTreeQuery(city,town,sectno,number,project,code,apply_code){//里樹狀結構反查
+	var data = new Object();
+	data.city=city;
+	data.town=town;
+	data.sectno=sectno;
+	data.landbuild=number;
+	data.project=project;
+	data.code=code;
+	data.apply_code=apply_code;
+	data.menu_cl=undefined;//一律以二類查詢
+	toGetCmd(data);	
+	data=null;
+}
+
+function getFileDataMore() {//取得分頁資料
+	$.ajax({
+		type: "POST",
+		url:'./result_moreData.action',
+		dataType: "json",  
+		error: function(xhr) {
+			 alert('取得資料失敗');
+			 $("#loading").hide();
+		    	$("#hideloading").show();
+	    },
+	    beforeSend:function(){
+	    	//$("#div_body").mask("取得資料中...");
+	    	$("#loading").show();
+	    	$("#hideloading").hide();
+	    	
+		},
+		success: function(data) {
+			 $("#loading").hide();
+		    	$("#hideloading").show();
+			var count=data.length;
+	
+			if(count==0){
+				//$("#div_body").unmask();
+		        //alert('無法讀取資料');
+		        return;
+			}
+		
+			var is_more="";
+			$.each(data, function(i, m) {
+			
+//				$('#trsindex tr:last').after('<tr class=\"'+m.filed+'\"><td>地段</td><td>'+m.sect+'</td></tr>');
+//				$('#trsindex tr:last').after('<tr class=\"'+m.filed+'\"><td>'+m.bulidlandtext+'</td><td>'+m.bulidlandno+'</td></tr>');
+//				$('#trsindex tr:last').after('<tr class=\"'+m.filed+'\"><td>序號</td><td>'+m.number+'</td></tr>');
+//				$('#trsindex tr:last').after('<tr class=\"'+m.filed+'\"><td>部別</td><td>'+m.qryitem+'</td></tr>');
+//				$('#trsindex tr:last').after('<tr class=\"'+m.filed+'\"><td>異動別</td><td>'+m.reqryitem+'</td></tr>');
+//				$('#trsindex tr:last').after('<tr class=\"'+m.filed+'\"><td>登記日期</td><td>'+m.regdate+'</td></tr>');
+//				$('#trsindex tr:last').after('<tr class=\"'+m.filed+'\"><td>登記次序</td><td>'+m.regid+'</td></tr>');
+//				$('#trsindex tr:last').after('<tr class=\"'+m.filed+'\"><td>登記原因</td><td>'+m.regcause+'</td></tr>');
+//				$('#trsindex tr:last').after('<tr class=\"'+m.filed+'\"><td>收件字號</td><td>'+m.casenumber+'</td></tr>');
+//				$('#trsindex tr:last').after('<tr class=\"'+m.filed+'\"><td>異動日期</td><td>'+m.redate+'</td></tr>');
+//				$('#trsindex tr:last').after('<tr class=\"'+m.filed+'\"><td style="border-bottom-style:none">權利人</td><td style="border-bottom-style:none">'+m.owner+'</td></tr>');
+				
+//				$('#trsindex tr:last').after('<tr class=\"'+m.filed+'\"><td>地段</td><td>'+m.sect+'</td><td>'+m.bulidlandtext+'</td><td>'+m.bulidlandno+'</td></tr>');
+//				$('#trsindex tr:last').after('<tr class=\"'+m.filed+'\"><td>序號</td><td>'+m.number+'</td><td>部別</td><td>'+m.qryitem+'</td></tr>');
+//				$('#trsindex tr:last').after('<tr class=\"'+m.filed+'\"><td>異動別</td><td>'+m.reqryitem+'</td><td>登記日期</td><td>'+m.regdate+'</td></tr>');
+//				$('#trsindex tr:last').after('<tr class=\"'+m.filed+'\"><td>登記次序</td><td>'+m.regid+'</td><td>登記原因</td><td>'+m.regcause+'</td></tr>');
+//				$('#trsindex tr:last').after('<tr class=\"'+m.filed+'\"><td>收件字號</td><td>'+m.casenumber+'</td><td>異動日期</td><td>'+m.redate+'</td></tr>');
+//				$('#trsindex tr:last').after('<tr class=\"'+m.filed+'\"><td style="border-bottom-style:none">權利人</td><td style="border-bottom-style:none">'+m.owner+'</td><td style="border-bottom-style:none"></td><td style="border-bottom-style:none"></td></tr>');
+				
+				
+				
+//				$('#trsindex tr:last').after('<tr class=\"'+m.filed+'\"><td width="1%">地段<b>:</b></td><td width="2%">'+m.sect+'</td><td width="1%">'+m.bulidlandtext+'<b>:</b></td><td width="2%">'+m.bulidlandno+'</td><td width="1%">序號<b>:</b></td><td width="2%">'+m.number+'</td></tr>');
+//				$('#trsindex tr:last').after('<tr class=\"'+m.filed+'\"><td>部別<b>:</b></td><td>'+m.qryitem+'</td><td>異動別<b>:</b></td><td colspan="3">'+m.reqryitem+'</td></tr>');
+//				$('#trsindex tr:last').after('<tr class=\"'+m.filed+'\"><td>登記日期<b>:</b></td><td>'+m.regdate+'</td><td>登記次序<b>:</b></td><td colspan="3">'+m.regid+'</td></tr>');
+//				$('#trsindex tr:last').after('<tr class=\"'+m.filed+'\"><td>登記原因<b>:</b></td><td>'+m.regcause+'</td><td>收件字號<b>:</b></td><td colspan="3">'+m.casenumber+'</td></tr>');
+//				$('#trsindex tr:last').after('<tr class=\"'+m.filed+'\"><td  style="border-bottom-style:none">異動日期<b>:</b></td><td  style="border-bottom-style:none">'+m.redate+'</td><td  style="border-bottom-style:none">權利人<b>:</b></td><td colspan="3"  style="border-bottom-style:none">'+m.owner+'</td></tr>');
+				
+				
+				$('#trsindex tr:last').after('<tr class=\"'+m.filed+'\"><td width="1%">地段<b>:</b></td><td width="2%">'+m.sect+'</td><td width="1%">'+m.bulidlandtext+'<b>:</b></td><td width="2%">'+m.bulidlandno+'</td></tr>');
+				$('#trsindex tr:last').after('<tr class=\"'+m.filed+'\"><td>部別<b>:</b></td><td>'+m.qryitem+'</td><td>登記次序<b>:</b></td><td colspan="3">'+m.regid+'</td></tr>');
+				$('#trsindex tr:last').after('<tr class=\"'+m.filed+'\"><td>登記日期<b>:</b></td><td>'+m.regdate+'</td><td>異動別<b>:</b></td><td colspan="3">'+m.reqryitem+'</td></tr>');
+				$('#trsindex tr:last').after('<tr class=\"'+m.filed+'\"><td>登記原因<b>:</b></td><td>'+m.regcause+'</td><td width="1%">序號<b>:</b></td><td width="2%">'+m.number+'</td></tr>');
+				
+				//$('#trsindex tr:last').after('<tr class=\"'+m.filed+'\"><td  style="border-bottom-style:none">異動日期<b>:</b></td><td  style="border-bottom-style:none">'+m.redate+'</td><td>收件字號<b>:</b></td><td colspan="3">'+m.casenumber+'</td></tr>');
+				$('#trsindex tr:last').after('<tr class=\"'+m.filed+'\"><td >異動日期<b>:</b></td><td>'+m.redate+'</td><td>收件字號<b>:</b></td><td colspan="3">'+m.casenumber+'</td></tr>');
+				
+				$('#trsindex tr:last').after('<tr class=\"'+m.filed+'\"><td  style="border-bottom-style:none">權利人<b>:</b></td><td style="border-bottom-style:none">'+m.owner+'</td><td  style="border-bottom-style:none"></td><td  style="border-bottom-style:none"></td></tr>');
+				
+				
+				
+				
+				
+				//$('#trsindex tr:last').after('<tr class=\"'+m.filed+'\"><td style="border-bottom-style:none">序號</td><td style="border-bottom-style:none">'+m.number+'</td><td style="border-bottom-style:none"></td><td style="border-bottom-style:none"></td></tr>');
+				
+				$('#trsindex tr:last').after('<tr><td style="border-bottom:3px solid #888888;" colspan="6" ></td></tr>');
+				
+//				$('#trsindex tr:last').after('<br clear="all" style="page-break-before:always">');
+				is_more=m.show;
+			});
+//
+			if(count>=10)
+			$(".more").show();
+
+			if(is_more=="no")
+			$(".more").hide();
+				
+			
+
+			//$("#div_body").unmask();
+		
+		}
+	});
+}
+
+
+function printMultiPage(){
+	
+	$.ajax({
+		type: "POST",
+		url: "./result_morePrint.action",
+		dataType : "json",
+		beforeSend:function(){
+	 	showSendMsg("列印中…");
+		},
+		error: function(xhr) {
+	     alert('載入資料失敗');
+	     hideSendMsg();
+	    },
+		success: function(data) {
+	    	hideSendMsg();
+	    	
+	    	if(data.val=="ok"){
+	    		var url="./GetFile"+data.text;
+	    		toPrintHtml(url);	
+	    	}else{
+	    		alert(data.text);
+	    	}
+	 
+	    
+		}
+	});
+	
+}
+
+
+
+function searchRsIndex(text){
+
+	$.ajax({
+		url: "./result_getResult",
+		type: "POST",
+		data:{'type':'LA','key_word':text},
+		error: function(xhr) {
+		alert("取得資料失敗");
+	    },
+	    beforeSend:function(){
+	    	showSendMsg("資料讀取中…");
+		},
+		success: function(response) {
+			hideSendMsg();
+			$(".content").empty();
+			$(".content").html(response);
+	    }
+	});
+}
+		
